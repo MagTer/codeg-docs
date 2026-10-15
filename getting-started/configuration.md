@@ -28,7 +28,7 @@ The variables you're most likely to set on a server:
 | -------- | ------- | ----------- |
 | `CODEG_PORT` | `3080` | HTTP and WebSocket listen port. |
 | `CODEG_HOST` | `0.0.0.0` | Bind address — an IP, `localhost`, or a bracketed IPv6 literal. `0.0.0.0` exposes it on every interface. |
-| `CODEG_TOKEN` | *(random)* | Access token required on every request. If unset, one is generated, saved to the database, and printed to stderr at startup. |
+| `CODEG_TOKEN` | *(random)* | Access token required on every API and WebSocket request. The exceptions carry proof of their own — a single-use download link, an Office live preview's per-document capability, a forge's [signed webhook delivery](/reference/privacy#webhooks-for-auto-processing) — or give nothing away: the web app's own files, and the login page's language lookup. If unset, one is generated, saved to the database, and printed to stderr at startup. |
 | `CODEG_DATA_DIR` | *(per-OS — see below)* | Root for the database, uploads, logs, and secrets. |
 | `CODEG_STATIC_DIR` | `./web` | Directory of the bundled web UI to serve. |
 | `CODEG_MCP_BIN` | *(auto)* | Path to the `codeg-mcp` companion when it doesn't sit beside the server binary — needed for some source builds. Without it, [multi-agent delegation](/guide/multi-agent) is silently disabled. |
@@ -91,7 +91,7 @@ For day-to-day use you can change the level from the UI instead — see [Setting
 
 ## Proxy support
 
-At startup Codeg snapshots the standard `HTTP_PROXY`, `HTTPS_PROXY`, and `ALL_PROXY` variables (and their lowercase forms) and propagates them to every agent process it launches. One proxy setting therefore covers Codeg *and* the agents it drives — the intended path for corporate gateways. Since **0.32.2** every agent launched with a proxy also gets the local addresses — `localhost`, `127.0.0.1`, `::1` — added to its `NO_PROXY`, so an agent's connections to its own local services never travel to a proxy on another machine; the **Bypass proxy for** list in [Settings → System](/reference/settings/system#network-proxy) adds addresses of your own. A `*` in that list, or in a `NO_PROXY` you export, is passed on alone as *bypass everything* — which Antigravity **1.3.0** no longer fully honours; the same page explains why. See [Privacy & Security](/reference/privacy) for how Codeg handles network access.
+At startup Codeg snapshots the standard `HTTP_PROXY`, `HTTPS_PROXY`, and `ALL_PROXY` variables (and their lowercase forms) and propagates them to every agent process it launches. One proxy setting therefore covers Codeg *and* the agents it drives — the intended path for corporate gateways. Since **0.32.2** every agent launched with a proxy also gets the local addresses — `localhost`, `127.0.0.1`, `::1` — added to its `NO_PROXY`, so an agent's connections to its own local services never travel to a proxy on another machine; the **Bypass proxy for** list in [Settings → System](/reference/settings/system#network-proxy) adds addresses of your own. A `*` in that list, or in a `NO_PROXY` you export, is passed on alone as *bypass everything* — which Antigravity no longer fully honours from **1.3.0** on; the same page explains why. See [Privacy & Security](/reference/privacy) for how Codeg handles network access.
 
 ## Advanced tuning
 
@@ -137,7 +137,7 @@ Two environment variables reach the [built-in browser](/guide/browser) on the de
 
 ## Your agents' own settings
 
-Codeg finds each agent's existing sessions through *that agent's* own environment variable — `CLAUDE_CONFIG_DIR`, `CODEX_HOME`, `GEMINI_CLI_HOME`, and so on. If you've pointed an agent CLI at a non-default location, Codeg follows it automatically. The full mapping is in [Supported Agents](/guide/supported-agents).
+Codeg finds each agent's existing sessions through *that agent's* own environment variable — `CLAUDE_CONFIG_DIR`, `CODEX_HOME`, `GEMINI_CLI_HOME`, and so on. If you've pointed an agent CLI at a non-default location, Codeg follows it automatically — whether the variable is set in Codeg's own environment or, since **0.35.2**, in that agent's **Environment Variables** under Settings → Agents, which wins. The full mapping is in [Supported Agents](/guide/supported-agents#where-each-agent-keeps-its-sessions).
 
 ## Next steps
 

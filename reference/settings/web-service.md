@@ -55,6 +55,8 @@ If the service is stopped but Codeg notices the configured port is already **hel
 - **Reachable means reachable.** Binding to `0.0.0.0` means anyone who can route to your machine on that port can hit the login — which is exactly why the token matters. On an untrusted network, keep the token strong and stop the service when you're done.
 - **Everything auto-saves.** Port, token, and auto-start persist as you change them; there's no save button. Edits to port and token take effect the next time you Start.
 - **The service is bound to this machine.** Other devices reach it over the network, but the workspace, files, and agents all still run here — the browser is just a window onto them.
+- **It's also where webhooks land.** While it runs, the service is the address a forge delivers the [Repository panel's webhooks](/guide/repository#set-up-the-webhook) to — a route that takes no access token and checks each delivery's signature instead. Stop the service and the desktop app stops receiving them; a scheduled scan doesn't need it. → [Privacy & Security](/reference/privacy#webhooks-for-auto-processing)
+- **A browser can keep a copy of the app.** Reached over HTTPS or on `localhost`, the web version caches its own files so it reopens without downloading Codeg again. → [Deployment](/getting-started/deployment#install-it-as-an-app)
 
 ## Related
 

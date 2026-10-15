@@ -84,6 +84,8 @@ Each server's detail pane has an **Enabled apps** row — a checkbox per agent. 
 
 Writing a server into a JSON config **keeps the file's key order**: since **0.32.0** the rest of it stays in the order you wrote it, instead of being re-sorted alphabetically on every save.
 
+**Kimi Code 2.2.0** rejects its whole `mcp.json` if any entry still names the retired `kaos` executor, so since **0.35.2** Codeg drops `kaos` from every Kimi entry it saves. An entry Codeg doesn't touch keeps whatever it had — if Kimi stops loading your servers after the upgrade, look for a leftover `kaos` there.
+
 That's **thirteen of the fifteen agents** — every one except **OpenClaw** and **Pi**. OpenClaw doesn't accept MCP servers at all (it's the one agent that opts out), so it's not offered as a target; Pi isn't in the list either. → [How agents differ](/guide/supported-agents#how-agents-differ)
 
 **DeepSeek** is the odd one out in *how* a server reaches it. Every other agent reads its own config file at startup, so Codeg writes there and steps back. The `deepseek-acp` bridge reads none — servers reach it only over the protocol, at session creation — so `$DSH_HOME/mcp.json` is Codeg's record of what to send rather than something the agent consults, and the ACP connection is the delivery path. One practical consequence: it hosts **stdio and streamable HTTP** servers only, and an **SSE** entry is refused when you save it rather than failing later at launch.
@@ -103,6 +105,7 @@ Because a server lives in the agent's config, the agent reads it when it **start
 - **It works the same on a server.** The MCP screen is in the browser build too; a remote server just needs the machine Codeg runs on to reach the endpoint.
 - **Removing a server** takes it out of every agent it was enabled for at once — you don't have to clean up each config by hand.
 - **Claude Code answers `/mcp` in the conversation.** Since **0.34.0** (adapter 0.86.0) `/mcp` is in Claude Code's `/` menu and replies with your MCP servers and their tool counts, and `/mcp reconnect`, `/mcp enable` and `/mcp disable`, followed by a server's name or `all`, act on them. Neither the command nor its answer is shown when you open the conversation again. A reconnect can't start a server's OAuth sign-in from Codeg.
+- **So does Codex, since 0.35.0.** With codex-acp **2.2**, `/mcp` in a Codex conversation reports each MCP server's **live status**, and `/mcp reconnect` reconnects them. Each status check briefly starts one more copy of every session MCP server, Codeg's own companion included, which is harmless.
 
 ## Next steps
 

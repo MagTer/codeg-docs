@@ -5,7 +5,7 @@ description: Run Codeg headlessly on a Linux or macOS server with codeg-server o
 
 # Deployment
 
-**`codeg-server`** is Codeg running headless — the same agents, sessions, channels, and [multi-agent collaboration](/guide/multi-agent) as the desktop app, served from a machine you control and reachable in any browser. Stand it up once on an always-on server and your workspace is there from any device, no desktop required. Every request is guarded by an access token.
+**`codeg-server`** is Codeg running headless — the same agents, sessions, channels, and [multi-agent collaboration](/guide/multi-agent) as the desktop app, served from a machine you control and reachable in any browser. Stand it up once on an always-on server and your workspace is there from any device, no desktop required. It's guarded by an access token.
 
 ::: tip Just want your desktop app in a browser now and then?
 You don't need a server for that — turn on [Web Service](/reference/settings/web-service) and your running desktop app serves itself over the network. Reach for `codeg-server` when you want Codeg running **without** a desktop: always-on, headless, or shared.
@@ -40,7 +40,7 @@ docker run -d -p 3080:3080 \
   ghcr.io/spacering-net/codeg:latest
 ```
 
-Images are published multi-arch (amd64 + arm64) to `ghcr.io/spacering-net/codeg` and Docker Hub `xintaofei/codeg`, tagged with each release's version (`:0.34.0`). `:latest` follows **stable** releases only — a release candidate gets a version tag of its own, ending in `-rc.N`, and never moves `latest`.
+Images are published multi-arch (amd64 + arm64) to `ghcr.io/spacering-net/codeg` and Docker Hub `xintaofei/codeg`, tagged with each release's version (`:0.35.2`). `:latest` follows **stable** releases only — a release candidate gets a version tag of its own, ending in `-rc.N`, and never moves `latest`.
 
 ::: warning Pulling from `ghcr.io/xintaofei/codeg`? Switch names
 Codeg's repository moved to `spacering-net/codeg`, and since **0.34.0** GitHub's registry publishes under the new name. **`ghcr.io/xintaofei/codeg` stays at 0.33.0** — a container or Compose file that still names it keeps pulling that release and never updates again. Change the image to `ghcr.io/spacering-net/codeg`; the `codeg-data` volume isn't tied to the image name, so your data comes along. Docker Hub's `xintaofei/codeg` carries on as before.
@@ -176,7 +176,8 @@ Left unset, `CODEG_TOKEN` is generated randomly and printed to the logs — fine
 By default the server binds `0.0.0.0:3080`, so it's reachable from any device that can route to the host. That's exactly what you want for remote access — which also means the **token is your only guard**. A few things to get right on a public host:
 
 - **Put it behind HTTPS.** `codeg-server` speaks plain HTTP and has no built-in TLS. Front it with a reverse proxy — Caddy, nginx, or Traefik — that terminates TLS and forwards to `127.0.0.1:3080`. Set `CODEG_HOST=127.0.0.1` so only the proxy, not the whole network, can reach the server directly.
-- **Keep the token secret.** Every HTTP and WebSocket request must carry it; there is no anonymous access. Rotate it by restarting with a new `CODEG_TOKEN`.
+- **Keep the token secret.** Every API and WebSocket request must carry it, apart from a few that carry proof of their own — single-use download links, an Office live preview's per-document capability, and a forge's webhook deliveries, which are signed instead — and the app's own files and the login page's language lookup, which give nothing away. Rotate it by restarting with a new `CODEG_TOKEN`.
+- **Let the forge in, if you use webhooks.** The Repository panel's [webhook trigger](/guide/repository#set-up-the-webhook) is delivered to `/api/forge_webhook` on this server, and a forge can only deliver to an address it can reach. If a sign-in gateway stands in front — Cloudflare Access, say — exempt that path, or the deliveries never get to Codeg; each one is checked against a folder's secret on arrival. → [Webhooks](/reference/privacy#webhooks-for-auto-processing)
 - **Publish the bridge ports the same way.** The [port bridge](/guide/browser#in-a-browser-session-the-port-bridge) binds `CODEG_BRIDGE_PORTS` on `CODEG_HOST` too. Each of those ports only answers a browser that opened the page from a signed-in workbench, but behind a TLS proxy they need TLS as well (the workbench addresses them with its own scheme), and with `CODEG_HOST=127.0.0.1` they need forwarding like the main port. Set `CODEG_BRIDGE_PORTS=off` if you would rather not run it.
 - **Or skip the ports.** With `CODEG_BRIDGE_HOST_PATTERN`, dev servers are reached by name on the port the workbench already uses — `3000.codeg.example.com` — so there's nothing extra to publish, as long as a wildcard DNS record and a wildcard virtual host on your proxy send those names to the server.
 - **Decide what a remote workspace's browser may reach.** A desktop app attached to this server as a [remote workspace](/guide/browser#in-a-remote-workspace-window) opens the server's own addresses in its built-in browser through a tunnel the server carries — to anything the server can reach, by default, on the reasoning that the token can already run commands there. `CODEG_BROWSER_TUNNEL=private` keeps it to loopback, private and link-local addresses — which still includes a cloud provider's metadata address — and `off` closes it.
@@ -195,6 +196,19 @@ The headers belong to **that connection's host** and go nowhere else — and, li
 ::: warning These are stored in the database, not the keyring
 A connection's access token and its custom headers live in that connection's row in Codeg's SQLite database, unencrypted — unlike your Git and chat credentials, which go to the OS keyring. Anyone who can read the data directory can read them. → [Privacy & Security](/reference/privacy#where-secrets-are-kept)
 :::
+
+## Install it as an app
+
+The web version installs like an app. Add it to a phone's home screen — or install it from a desktop browser that offers to — and it opens in a window of its own with a full-bleed icon. Since **0.35.0** a phone's browser bar, and Android's navigation bar, follow your light or dark theme, and the app's manifest is fetched with your cookies, so installing works behind a sign-in proxy too.
+
+Since **0.35.2** it also **keeps a copy of itself in your browser**. A tab the browser put to sleep reopens without downloading Codeg again, and a reload while the server is restarting or offline shows Codeg's own *Connection lost* screen, with **Reconnect now**, instead of the browser's error page. What's kept is the app and nothing of yours:
+
+- **Build files and page shells only.** No `/api` call and no live connection ever goes through that cache, so no conversation, file or setting is stored in it — and a dev server shown through the [port bridge](/guide/browser#in-a-browser-session-the-port-bridge) passes straight through.
+- **Only where browsers allow it** — over **HTTPS**, or on `localhost`. A phone reaching the server at a plain `http://` LAN address doesn't get one, and the desktop app never uses it.
+- **One copy per release.** A new version installs a fresh copy and clears the older ones, keeping only the previous release's files. If installing can't complete — behind a sign-in proxy that redirects the request for it, say — there's simply no copy, and nothing else changes.
+- **Pages still come from the server first.** A page load uses the copy only when the server can't answer — no connection at all, or a server error — so a redirect to a sign-in page, or any other answer the server gives, goes through as usual. The build files themselves, which don't change within a release, are served straight from the copy.
+
+Codeg has no switch for it; to remove the copy, clear the site's data in your browser.
 
 ## Keep your server up to date
 

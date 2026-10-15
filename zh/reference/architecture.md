@@ -77,7 +77,7 @@ Codeg 并不重新实现 Claude Code、Codex、Gemini 等等 —— 它**驱动�
 
 ## 你的数据存放在哪里 {#where-your-data-lives}
 
-Codeg 将其状态保存在**本地机器**上，默认位于 **`~/.codeg/`** 之下（用 `CODEG_HOME` 覆盖；服务器可使用 `CODEG_DATA_DIR`）。该目录存放 **SQLite 数据库**（对话、设置、账户元数据）、你的**[技能](/zh/guide/skills)**，以及**上传**和**[日志](/zh/reference/settings/logs)**目录。机密是刻意的例外：在桌面端，令牌会进入**操作系统密钥环**，而非上述任何文件 —— 这一拆分在[版本控制](/zh/reference/settings/version-control)以及[备份与恢复](/zh/reference/settings/system)中都有描述。
+Codeg 将其状态保存在**本地机器**上。它的[数据目录](/zh/getting-started/configuration#where-codeg-stores-its-data) —— 即平台自己的数据目录，例如 macOS 上桌面应用的 `~/Library/Application Support/app.codeg`，或服务器上的 `CODEG_DATA_DIR` —— 存放 **SQLite 数据库**（对话、设置、账户元数据），以及**上传**和**[日志](/zh/reference/settings/logs)**目录。你的**[技能](/zh/guide/skills)**存放在 **`~/.codeg/`** 之下，它会随 `CODEG_HOME` 移动 —— 而一旦设置了 `CODEG_HOME`，上传和日志也会随它一起搬过去。机密是刻意的例外：在桌面端，令牌会进入**操作系统密钥环**，而非上述任何文件 —— 这一拆分在[版本控制](/zh/reference/settings/version-control)以及[备份与恢复](/zh/reference/settings/system)中都有描述。
 
 中间没有 Codeg 云。桌面应用和你运行的服务器都将一切保留在它们运行所在的机器上；唯一离开的，只是智能体自身对你所配置的模型提供商的调用。[隐私与安全](/zh/reference/privacy)介绍了这在实践中意味着什么。
 

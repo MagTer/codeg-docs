@@ -31,7 +31,7 @@ Hit **New automation** and either pick a template or start blank. Codeg ships se
 | **TODO sweep** | Collect and prioritize `TODO`/`FIXME` comments |
 | **Release notes** | Summarize changes since the last release tag |
 
-A template just seeds the editor — a suggested prompt and cadence you then tweak. The editor itself is **the same composer you use for a normal conversation**: a rich prompt box with `@`-mentions for files, agents, sessions, commits, and [skills](/guide/skills), the `/` command menu, an agent picker, and the mode-and-options bar. Whatever you'd set up for a one-off message, you capture here as a reusable launch. Give it a name, write the prompt, and the rest is *where* and *when*.
+A template just seeds the editor — a suggested prompt and cadence you then tweak. The editor itself is **the same composer you use for a normal conversation**: a rich prompt box with `@`-mentions for files, agents, sessions and commits, the `/` command menu for commands and [skills](/guide/skills) — with each command's arguments shown beside it since **0.35.0** — an agent picker, and the mode-and-options bar. Whatever you'd set up for a one-off message, you capture here as a reusable launch. Give it a name, write the prompt, and the rest is *where* and *when*.
 
 ## Choose what a fire does
 

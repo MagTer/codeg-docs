@@ -15,12 +15,12 @@ Codeg 将每一项偏好都汇集到同一个**设置**窗口中（其侧边栏�
 
 | 设置界面 | 控制内容 | 文档位置 |
 | --------------- | ---------------- | ------------- |
-| **外观** | 主题模式与配色、窗口缩放、字体、桌面宠物 | [外观](/zh/reference/settings/appearance) |
-| **常规** | 默认终端、命令输出颜色、渲染、关闭按钮行为、桌面通知与提示音 | [常规](/zh/reference/settings/general) |
+| **外观** | 主题模式与配色、窗口缩放、字体、聊天区域动画与宽度、桌面宠物 | [外观](/zh/reference/settings/appearance) |
+| **常规** | 默认终端、命令输出颜色、渲染、@ 提及面板、关闭按钮行为、桌面通知、任务栏 / Dock 提醒与提示音 | [常规](/zh/reference/settings/general) |
 | **协作** | 智能体之间的委派，以及每个智能体拿到的会话内工具 | [协作](/zh/reference/settings/collaboration) |
 | **MCP** | Model Context Protocol 服务器 —— 添加、扫描、按智能体启用 | [指南 → MCP 服务器](/zh/guide/mcp) |
 | **Skills** | 编写和编辑你自己的智能体技能 | [指南 → 技能](/zh/guide/skills) |
-| **技能包** | 精选合集 —— Experts、Science、Office | [指南 → 技能](/zh/guide/skills#enable-a-curated-skill-pack) |
+| **技能包** | 精选合集 —— 专家、科学研究、办公工具 —— 外加界面渲染技能和你自己的技能 | [指南 → 技能](/zh/guide/skills#enable-a-curated-skill-pack) |
 | **智能体** | 智能体 CLI —— 连接、配置、运行预检，以及[注册你自己的](/zh/guide/custom-agents) | [指南 → 使用智能体](/zh/guide/agents) |
 | **模型供应商** | 智能体使用的 API 提供商凭据 | [指南 → 认证与模型](/zh/guide/authentication) |
 | **快捷消息** | 供 composer 使用的可复用消息片段 | [快捷消息](/zh/reference/settings/quick-messages) |

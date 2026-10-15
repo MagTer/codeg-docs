@@ -1,6 +1,6 @@
 ---
 title: Repository Panel
-description: Hand a GitHub, GitLab or Gitea issue or pull request straight to an agent — it works in its own worktree, you review the result on the board, and the outcome goes back to the thread it came from.
+description: Hand a GitHub, GitLab or Gitea issue or pull request straight to an agent, or let the panel pick matching ones up on a schedule or a webhook — each works in its own worktree, you review the result on the board, and the outcome goes back to the thread it came from.
 ---
 
 # Repository Panel
@@ -8,6 +8,8 @@ description: Hand a GitHub, GitLab or Gitea issue or pull request straight to an
 Most agent work starts with someone reading an issue and retyping it into a prompt. The **Repository panel** removes that step: it lists a folder's **GitHub, GitLab or Gitea** issues and pull requests inside Codeg, and hands the one you pick to an agent as a [to-do task](/guide/tasks) — its own worktree, its own session, and the same review gate before anything lands.
 
 It shipped in **0.27.0** behind a **Beta** mark, which came off in **0.30.0** once the panel could do the whole loop: read a change through tabs, comment on it, open and close issues, and merge — without a browser. **Gitea** joined in **0.30.4**, and with it **Forgejo**: Forgejo is a fork of Gitea serving the same `/api/v1`, so the client that talks to one talks to the other and there's no separate setting for it.
+
+Since **0.35.2** the panel can also do the handing over itself. [Auto-processing](#let-it-pick-items-up-by-itself) scans the repository on a schedule, or the moment the forge sends a webhook, and turns the items that match your rules into tasks — the same tasks **Start** would have made, through the same gates.
 
 ::: tip Where it fits
 The panel is a *front door* to To-dos, not a parallel system. Everything it creates is an ordinary task on the ordinary board, with one extra fact recorded: which item it came from. That provenance is what unlocks the delivery step at the end — and what makes the [auto-merge rule](#the-rules-that-do-not-bend) different.
@@ -99,8 +101,8 @@ For an **issue**:
 
 | Scenario | What the agent is told |
 | --- | --- |
-| **Fix / implement** | Confirm the problem is really there, then fix the cause you identified — and verify it the way this project would, with build, tests or lint |
-| **Plan first** | Confirm the problem is really there, then deliver an implementation plan — approach, files, risks, how it'll be verified — and stop. Change no files |
+| **Fix / implement** | Judge whether the report holds up, then fix the cause you identified — and verify it the way this project would, with build, tests or lint |
+| **Plan first** | Judge whether the report holds up, then deliver an implementation plan — approach, files, risks, how it'll be verified — and stop. Change no files |
 
 For a **pull or merge request**:
 
@@ -111,7 +113,11 @@ For a **pull or merge request**:
 
 Three things separate these from a prompt you'd write yourself.
 
-**Both issue scenarios have to confirm the problem before acting on it.** Not as a preamble — as a step with an outcome. The agent is told to reproduce the reported behaviour, or otherwise show from the code where and why it goes wrong, with file and line references; and for a feature request, to confirm the behaviour is genuinely missing rather than already available under another name or setting. This was a separate *Investigate only* scenario until **0.28.2**, and it was retired precisely because being a mode you could pick made verification look like something the other two could skip. → [When it turns out not to be real](#when-it-turns-out-not-to-be-real)
+**Both issue scenarios have to judge the report before acting on it.** Not as a preamble — as a step with an outcome. The agent is told to reproduce the reported behaviour, or otherwise show from the code where and why it goes wrong, with file and line references; and for a feature request, to confirm the behaviour is genuinely missing rather than already available under another name or setting, and that adding it fits how the project already works.
+
+Since **0.35.2** the question is wider than *does it reproduce*, because a report can describe something that really happens and still not hold. It doesn't hold when the behaviour **can't be reproduced**, is **already fixed** here, only happens because of the **reporter's own environment or configuration**, or is **what the project intends** — a report of intended behaviour is a feature request, not a bug. What the report says about the cause, and the fix it suggests, are **claims to check**, not instructions: a real problem with the wrong diagnosis still holds, and the agent works on the cause it found. And when it can't tell which side of that line a report falls on — too vague to reproduce, or a question of intent only the maintainers can answer — it's told to treat the report as not holding, because that call is yours.
+
+Verification was a separate *Investigate only* scenario until **0.28.2**, and it was retired precisely because being a mode you could pick made verification look like something the other two could skip. → [When the report doesn't hold](#when-it-turns-out-not-to-be-real)
 
 **The review scenarios get the change already checked out.** The worktree starts at the pull request's **head commit**, so the agent reads and builds the actual proposal rather than the base branch, and its commits go *on top* — which is what makes pushing them back sensible later.
 
@@ -128,15 +134,17 @@ The rest of the dialog:
 
 Create it and you get an ordinary to-do, in that folder, which starts under the folder's own concurrency limit like any other.
 
-### When it turns out not to be real
+### When the report doesn't hold {#when-it-turns-out-not-to-be-real}
 
-Sometimes the answer to "confirm the problem" is *no*. An issue may already have been fixed, work as designed, describe a version you're not on, or simply not carry enough to go on.
+Sometimes the answer is *no*. An issue may already have been fixed, work as designed, happen only on the reporter's machine, describe a version you're not on, or simply not carry enough to go on.
 
-**That ends the task successfully.** The agent is told to change nothing, and to report what it ran, what it saw instead, the most likely explanation, and what it would need to take it further. The result lands in **To review** like any other, and *"it doesn't reproduce, and here's everything I checked"* is the work product — accept it. If the report gives you what was missing, send the task back with more detail and it picks up in the same worktree.
+**That ends the task successfully.** The agent is told to change nothing — not even the small improvements it noticed on the way — and to hand the decision back: what it ran, what it saw instead, the most likely explanation, and what would change its conclusion. Since **0.35.2** it's also told to **open its reply with the verdict**, in one line, so a task that stopped early says so at the top of its result rather than in the last paragraph — an instruction to the agent, not something Codeg checks. The result lands in **To review** like any other, and *"this report doesn't hold, and here's everything I checked"* is the work product — accept it. If the report gives you what was missing, send the task back with more detail, or with word to fix it anyway, and it picks up in the same worktree.
+
+The judgement can also land **midway**. If the work itself shows the report doesn't hold after all — the behaviour turns out to be intended, what the report asks for would break something the project relies on, or what the agent reproduced came from the environment rather than the code — it stops changing code there and hands the decision back the same way, saying what it had already changed. Finding a different cause than the report guessed isn't that: the agent fixes the cause it found.
 
 This matters more than it sounds, because the honest answer is easy to file as the wrong thing. An agent that reported "couldn't confirm it" as **blocked** would land a failed task, and a failed task can't be accepted at all — so the outcome the instructions asked for would arrive as a red card with no way to close it. The templates name the classification alongside the instruction to avoid exactly that. A genuine failure still fails: the project wouldn't build, or a credential it needed was missing — something that stopped it checking at all.
 
-A **Plan first** task behaves the same way, one step earlier: no confirmation, no plan. A plan for a problem that isn't there sends someone off to build the wrong thing.
+A **Plan first** task behaves the same way, one step earlier: a report that doesn't hold gets no plan. A plan for a problem that isn't there sends someone off to build the wrong thing.
 
 ### What the agent actually receives
 
@@ -191,7 +199,9 @@ If the comment fails to post, the timeline records that too rather than dropping
 
 ## Panel settings
 
-The settings dialog is scoped exactly like [task settings](/guide/tasks#task-settings) — one **global** row plus an optional **per-folder** override — and an override wins **wholesale**: saving one detaches that folder from the global row entirely rather than merging field by field. The rule is copied on purpose; the two dialogs sit one click apart and shouldn't do different arithmetic.
+The settings dialog is scoped exactly like [task settings](/guide/tasks#task-settings) — a **Scope** picker with one **global** row, *All folders (global defaults)*, plus an optional **per-folder** override, where **Configuration** chooses between *Global defaults* and *Custom* — and an override wins **wholesale**: saving one detaches that folder from the global row entirely rather than merging field by field. The rule is copied on purpose; the two dialogs sit one click apart and shouldn't do different arithmetic.
+
+Since **0.35.2** the form has two tabs. **General** holds what the dialog has always held:
 
 - **Default for issues** and **Default for pull / merge requests** — which scenario the Start dialog opens on. It only sets the starting position; the request that follows always names its scenario outright.
 - **Comment the outcome back by default** — the starting state of that switch, still yours to change per item.
@@ -199,15 +209,88 @@ The settings dialog is scoped exactly like [task settings](/guide/tasks#task-set
 
 Standing instructions land **after** the scenario's built-in wording and **before** your per-item note, so there's no need to restate the built-ins. They ride with the task's **opening order only** — text you want on every turn belongs in the task settings' [per-stage prompts](/guide/tasks#add-your-own-instructions-per-stage) instead. Each one caps at 4,000 characters, and going over is **refused with an error rather than silently trimmed**: text you typed shouldn't disappear without being told.
 
+**Auto-processing** is the other tab — see [below](#let-it-pick-items-up-by-itself). It carries a small dot whenever its rules are switched on in the form, so you can tell from the General tab that they're live. A folder set to follow the global defaults shows no tabs at all; while the global rules are on, it shows that folder's [Activity](#watch-it-work) instead, read-only, with **Scan now**.
+
+## Let it pick items up by itself
+
+**Auto-processing** turns matching issues and pull requests into tasks **without anyone pressing Start**. Each one goes through exactly the path the [Start dialog](#hand-it-over) does — the same scenario templates, the same fenced item content, the same standing instructions and duplicate guard — so an automatic task is an ordinary to-do that happens to have been created by a rule. Its timeline opens with *Created by auto-processing*, and the line names what set it off: a *scheduled scan*, a *webhook* or a *manual scan*.
+
+It does nothing until you switch on a trigger, and it's scoped like the rest of the dialog: rules on the global row cover every project folder that follows the global settings, and a folder on **Custom** has rules of its own. Only **open project folders** are processed — never a worktree, and never a folder you've closed.
+
+### What wakes it
+
+Two triggers, either or both:
+
+- **Scan on a schedule** — look through the repository every **Scan every** interval: 1, 5, 15 or 30 minutes, or 1, 3, 6, 12 or 24 hours. **15 minutes** is the default.
+- **Scan on webhook events** — scan as soon as the forge reports that an issue or pull request changed. → [Set up the webhook](#set-up-the-webhook)
+
+**A webhook only starts a scan.** Nothing in a delivery is trusted beyond the repository it names: the scan that follows reads the items from the forge's own API, with the folder's own account, exactly as a scheduled one does. So the two combine well — a webhook for speed, a schedule as the backstop for a delivery that never arrived.
+
+### What it picks up
+
+- **Issues** — on by default, handled as **Fix / implement** unless you choose **Plan first** under **Handle as**.
+- **Pull / merge requests** — off by default, handled as **Review & fix** unless you choose **Review only**. **Skip drafts until they are ready** starts ticked.
+
+These **Handle as** choices belong to this tab. They don't follow the General tab's two defaults, which only decide where the Start dialog opens.
+
+**Only what moved after you switched it on.** With **Include items that were already open** off — the default — a scan picks up only items **opened or updated** since auto-processing was switched on, and the hint under the switch names that moment. The window runs on the forge's *updated* time, so any update brings an older item in; labelling it is the deliberate way to do that. A scan normally reads only what changed since the one before; editing the rules sends the next one back to that starting moment, so items the old rules passed over get another look, and switching both triggers off and on again starts the clock anew. Turn **Include items that were already open** on and every open item that matches is fair game.
+
+**Each item is picked up at most once.** An item that has ever had a task — in any state, archived, even one you deleted, and including a task you started by hand — is left alone from then on. Starting another one yourself from the panel still works.
+
+### Rules for labels and authors
+
+Four lists, each a row of chips — type a pattern and press Enter:
+
+- **Only items with one of these labels**
+- **Never items with any of these labels**
+- **Only items opened by**
+- **Never items opened by**
+
+Patterns ignore case, and `*` matches anything: `area/*` is every label starting with `area/`, `*[bot]` every bot account. Anything else matches exactly — `bug` doesn't match `bugfix`. An item has to pass **every list that has entries**, the **Never** lists always win, and an empty list doesn't filter at all; an item with no author on record fails a non-empty *Only items opened by*. Each list takes up to 100 patterns of up to 200 characters, and going over is refused on save rather than trimmed. In a folder's own settings, the label fields suggest the repository's labels as you type.
+
+### What happens to what it creates
+
+- **Start right away** — on by default. Each new task is queued at once, and the folder's concurrency limit decides when it runs, exactly as if you'd pressed **Start** on its card. Off, it waits in **To do** — unless the folder's [task settings](/guide/tasks#task-settings) have **Process automatically** on, in which case the board claims it as soon as there's room anyway.
+- **Comment the outcome back** — off by default, and separate from the General tab's default, which is on. When a task finishes it posts the same short status comment the Start dialog's switch would — [built from the outcome and the counters only](#the-comment-that-goes-back).
+
+The account that reads the item, and later pushes its branch, is the host's **default account at the moment the scan creates the task** — and from then on it's pinned to the task, as it is for one you start yourself. Nothing about merging changes: a task from a repository item still [never merges unattended](#the-rules-that-do-not-bend).
+
+### Watch it work
+
+When the scope is a folder — one with its own rules, or one following the global ones — the tab ends in an **Activity** card:
+
+- **The last scan** — when, what set it off, and four counts: *listed* (open items inside the window), *matched* (passed the rules), *already had a task*, and *created*.
+- **New tasks**, by number and title.
+- **Passed over**, with why: *other kind*, *not open*, *draft*, *excluded label*, *excluded author*, *no matching label*, *author not listed*.
+- **What went wrong**, if anything — an item that couldn't be created, a task created but not started, or a scan that stopped on an error such as a missing account.
+- **The next scheduled scan** and **the last webhook delivery**, where those apply.
+
+A listing too long to read in one go is cut short and says so; the next scan carries on through the same window. **Scan now** runs one straight away with the **saved** rules, so it waits until a trigger is switched on and saved, and until any edit you've made is saved too. The activity is kept in memory, and a restart empties it.
+
+Only one Codeg process runs the to-do board for a data directory, and auto-processing runs wherever the board does. A desktop app and a server sharing one directory therefore don't both scan; the one that doesn't hold the board says *Another codeg process runs the task board for this data directory, so auto-processing runs there, not here.*
+
+### Set up the webhook
+
+Switch on **Scan on webhook events** and the tab gives you the two values to paste into the forge:
+
+- **Payload URL** — where deliveries go, ending in `/api/forge_webhook`. In a browser, or a desktop window attached to a remote workspace, it's the server you're already talking to. The **desktop app** receives webhooks only while its [Web Service](/reference/settings/web-service) is running, and then lists one URL per address the service reports; with the service stopped, the list is empty and says where to start it.
+- **Secret** — a random one is generated the moment you switch the webhook on; there's no field to type one of your own. The eye button reveals it, **Copy** copies it either way, and **Generate a new secret** replaces it on the next Save. Switching the webhook off keeps the secret, so the value already pasted into the forge still works when you switch it back on.
+
+In the repository's webhook settings, enter that URL with the content type **`application/json`** and the secret, and choose the **issue** and **pull request** events — on GitLab, **Issues events** and **Merge request events**, with the secret as the **Secret token**. Pushes, comments and every other event are acknowledged and ignored.
+
+**The forge has to be able to reach that address.** A LAN address works for a self-hosted forge on the same network; it doesn't for github.com. When the forge can't reach Codeg, scan on a schedule instead.
+
+Every delivery has to prove it knows the secret — an HMAC signature from GitHub, Gitea and Forgejo, the secret token itself from GitLab — and one that doesn't is refused before anything else happens. Each answer is a single line in the forge's own delivery log, which is where to look when a webhook isn't working: *pong* for GitHub's test ping, *scanning …* for an accepted delivery, *ignored* with the reason for an event or a repository that doesn't apply. → [Privacy & Security](/reference/privacy#webhooks-for-auto-processing)
+
 ## The rules that do not bend
 
 - **No task from a repository item ever merges automatically.** Not a setting you can turn on — a rule. Its prompt embeds text written by arbitrary external users, so landing it unattended would be an injection-to-main-branch pipeline. A folder set to [land reviewed tasks by itself](/guide/tasks#let-a-folder-land-them-for-you) skips these rows entirely. For an **issue**-sourced task your own **Merge** click still works normally; a human just has to make it.
 - **A task from a pull request can't be merged locally at all.** Its work belongs on the pull request's own branch, where its author and reviewers are looking — landing it on your base branch would take those changes in behind their backs, under a local commit, with the pull request left open and apparently unmerged. So **Merge** is replaced by **Push to the pull request**, and the refusal lives in the backend rather than only in the button, so an old client or a direct API call meets it too.
-- **The identity is pinned at trigger time.** Which account reads the item and pushes the branch is decided when you press Create, and a later default change doesn't move it. Updating that account's **token** keeps the identity intact — [removing and re-adding the account does not](/reference/settings/version-control#github-accounts).
+- **The identity is pinned at trigger time.** Which account reads the item and pushes the branch is decided when you press Create — or, for an [automatic task](#let-it-pick-items-up-by-itself), when the scan creates it — and a later default change doesn't move it. Updating that account's **token** keeps the identity intact — [removing and re-adding the account does not](/reference/settings/version-control#github-accounts).
 
 ## Good to know
 
-- **Nothing is cached.** The panel reads the forge's REST API directly each time — no local mirror of your issues, and nothing fetched on a background timer. Refresh is a button.
+- **Nothing is mirrored.** The panel reads the forge's REST API directly each time — there's no local copy of your issues, and Refresh is a button. The only reads that happen without you are the scans you switch on under [auto-processing](#let-it-pick-items-up-by-itself).
 - **It's per folder.** The panel acts on the project folder you've picked, and refuses an item whose repository doesn't match that folder's remote, naming both.
 - **The row can be hidden.** If you don't use it, switch **Repository panel** off under the sidebar's [navigation items](/guide/workspace#choose-which-navigation-rows-you-see) — quick actions still reaches it.
 - **Self-hosted works.** GitHub Enterprise, self-managed GitLab, and a Gitea or Forgejo instance all resolve by their server URL, including on a non-default port or plain `http://`, and links back to the item are built from that same origin. Asking the instance what it is, rather than guessing from its hostname, arrived for **GitLab in 0.30.0** — which is what used to fail as a bare `410` — and the **Gitea and Forgejo** question was added in **0.30.4**.

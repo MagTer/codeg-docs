@@ -23,7 +23,7 @@ The surface every Codeg session runs on — learn these first.
 - [**Infinite Canvas**](/guide/canvas) — boards that lay your work out in space, as many as you like: regions bound to folders, Collections you curate, pinned files and terminals, and cards that expand into working conversations.
 - [**Conversation Aggregation**](/guide/aggregation) — pull your existing sessions from every supported agent into one searchable workspace, and pick any of them up where you left off.
 - [**Git & Worktrees**](/guide/git) — review diffs, stage and commit, manage remotes, and run work in parallel with built-in git worktrees.
-- [**Token Usage**](/guide/token-usage) — what your agents actually spent, by day, folder, agent and model, with a cache-hit reading and a card you can share.
+- [**Token Usage**](/guide/token-usage) — what your agents actually spent, by day, folder, agent and model, what it would cost at API list prices, with a cache-hit reading and a card you can share.
 
 ## Agents
 
@@ -42,7 +42,7 @@ Drive Codeg without sitting in front of it.
 - [**Chat Channels**](/guide/chat-channels) — connect Telegram, Lark (Feishu), and iLink (Weixin) to create tasks, approve permissions, and get live updates — all from your chat app.
 - [**Automations**](/guide/automations) — save a fully-configured composer as a reusable automation and run it headlessly, on a cron schedule or on demand.
 - [**To-dos**](/guide/tasks) — write down what needs doing and let agents work through the list, each in its own git worktree, waiting for your review before anything merges.
-- [**Repository Panel**](/guide/repository) — hand a GitHub or GitLab issue or pull request straight to an agent, then send the result back as a pull request or a comment.
+- [**Repository Panel**](/guide/repository) — hand a GitHub, GitLab or Gitea issue or pull request straight to an agent, or let the panel pick them up on a schedule or a webhook, then send the result back as a pull request or a comment.
 
 ## Extending Codeg
 

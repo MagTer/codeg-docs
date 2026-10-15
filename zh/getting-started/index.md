@@ -91,11 +91,11 @@ Codeg 把智能体视为你可以*运行*的东西，而不仅仅是与之聊天
 
 - **[自动化](/zh/guide/automations)**——保存一套完整配置的设置，以无头方式按 cron 计划或按需运行。
 - **[待办任务](/zh/guide/tasks)**——把要做的事写下来，让智能体一件件做完，每个任务都在一份独立的代码副本中进行，且在你验收之前都不会合并。
-- **[仓库面板](/zh/guide/repository)**——把一个项目的 GitHub 或 GitLab issue 与 pull request 列出来，把其中一条交给智能体，再把结果作为 pull request 送回去。
+- **[仓库面板](/zh/guide/repository)**——把一个项目的 GitHub、GitLab 或 Gitea issue 与 pull request 列出来，把其中一条交给智能体——或者让面板自己把符合条件的接过去——再把结果作为 pull request 送回去。
 - **[电脑操作](/zh/guide/computer-use)** *（预览）*——把一个桌面窗口、整个应用或整个屏幕共享给你的智能体，让它们看得见、能上手操作，一键就能让它们停下。
 - **[聊天频道](/zh/guide/chat-channels)**——从 Telegram、Lark（飞书）或 iLink（微信）驱动会话：创建任务、批准权限，并实时获得回复，无需打开浏览器。
 - **[随处使用](/zh/getting-started/installation)**——在桌面应用、独立服务器或 Docker 中运行智能体，再通过原生 iOS、Android 客户端或任意浏览器保持连接。
-- **[可扩展](/zh/guide/mcp)**——MCP 服务器和[技能](/zh/guide/skills)可添加工具与专业能力，而内置的 [Office](/zh/guide/office) 和[科学研究](/zh/guide/research)工具集则赋予智能体真实世界的能力。新项目从[项目引导](/zh/guide/project-boot)开始。
+- **[可扩展](/zh/guide/mcp)**——MCP 服务器和[技能](/zh/guide/skills)可添加工具与专业能力，而内置的 [Office](/zh/guide/office) 和[科学研究](/zh/guide/research)工具集则赋予智能体真实世界的能力，[界面渲染](/zh/guide/skills#cards-tables-and-charts-in-replies)还能让它们用卡片、表格和图表作答。新项目从[项目引导](/zh/guide/project-boot)开始。
 
 <div class="light-only">
 
@@ -114,7 +114,7 @@ Codeg 把智能体视为你可以*运行*的东西，而不仅仅是与之聊天
 Codeg 刻意不对你*应该*使用哪个智能体持有成见，并谨慎对待你的数据：
 
 - **智能体无关。** 新智能体通过 ACP 接入，而非借助定制集成，因此工作区会随生态系统一同成长。
-- **本地优先。** 解析、存储和项目操作默认都在你的机器上进行；只有在你触发操作时才会发生网络调用。参见[隐私与安全](/zh/reference/privacy)。
+- **本地优先。** 解析、存储和项目操作默认都在你的机器上进行；网络调用只会因你自己发起的事情而发生。参见[隐私与安全](/zh/reference/privacy)。
 - **一个内核，四个二进制文件。** 一个共享的 Rust 内核同时驱动桌面应用、独立服务器、MCP 伴生程序和电脑操作 helper；原生移动客户端则通过经过认证的 API 连接到这个内核。参见[架构](/zh/reference/architecture)。
 
 Codeg 站在开放工作的肩膀之上——用 [Agent Client Protocol](https://agentclientprotocol.com) 实现智能体连接，用 [Superpowers](https://github.com/obra/superpowers) 提供专家技能，用 [OfficeCLI](https://github.com/iOfficeAI/OfficeCLI) 处理文档，用 [scientific-agent-skills](https://github.com/K-Dense-AI/scientific-agent-skills) 支持科研。

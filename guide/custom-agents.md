@@ -22,6 +22,8 @@ Each row carries an **Add** button, unless one of two things is true:
 
 Press **Add** and the row spins briefly, then flips to *Added* as the agent joins the list on the left. Adding pulls in the entry's whole `distribution` object verbatim, picks the channel that runs on your machine, and **inlines the agent's icon** into the saved definition — so the mark still renders later, even offline.
 
+On **Windows**, most of the registry's binary agents only install since **0.35.0**: they used to look for a doubled name like `kilo.exe.exe` and stop at *Locating binary…*.
+
 ## Add one by hand
 
 The **Manual** tab is for anything the registry doesn't carry: an agent you're building, an internal tool, a fork with a different package name. It's a short form.
@@ -63,7 +65,7 @@ Three channels are understood, and a **Templates** row drops a filled-in starter
     }
   }
   ```
-- **`binary`** — a downloadable archive, **keyed by platform**. The template is pre-filled with *your* machine's key (`darwin-aarch64`, `linux-x86_64`, and so on), so what you write is something this machine can actually install.
+- **`binary`** — a downloadable archive, **keyed by platform** — or, since **0.35.0**, a single executable published as it is, which installs like a one-file archive as long as it's a native program for this platform. Installer packages (`.dmg`, `.pkg`, `.deb`, `.rpm`, `.msi`) are still refused. The template is pre-filled with *your* machine's key (`darwin-aarch64`, `linux-x86_64`, and so on), so what you write is something this machine can actually install.
   ```json
   {
     "binary": {
@@ -104,7 +106,7 @@ If the agent can't run here at all, the detail pane says why in place: *"This ag
 
 Every built-in agent keeps its own session files, and Codeg [reads them natively](/guide/aggregation). An arbitrary ACP agent usually keeps nothing usable — so Codeg writes the history itself.
 
-Each session gets an **append-only JSONL transcript** under `acp-transcripts/<registry-id>/`, recording the prompts sent and the updates received, straight from the protocol. That folder sits in `~/.codeg/` by default, and follows `CODEG_HOME` — or `CODEG_DATA_DIR` if only that is set — exactly like the rest of Codeg's own data, which is what you'll want on a server. → [Configuration](/getting-started/configuration#where-codeg-stores-its-data) Codeg then projects that back into conversations exactly the way it projects a built-in agent's native store: the sessions appear in the Conversations list, open with their full transcript, and turn up in [import](/guide/aggregation). A session you opened but never prompted isn't listed, and a session the agent no longer remembers is chained onto its successor so it isn't shown twice.
+Each session gets an **append-only JSONL transcript** under `acp-transcripts/<registry-id>/`, recording the prompts sent and the updates received, straight from the protocol — since **0.35.0** that includes what you [insert into a running turn](/guide/workspace#talk-to-an-agent-mid-turn) and the turns an agent starts on its own, after a background job say, so those survive a reload too. That folder sits in `~/.codeg/` by default, and follows `CODEG_HOME` — or `CODEG_DATA_DIR` if only that is set — exactly like the rest of Codeg's own data, which is what you'll want on a server. → [Configuration](/getting-started/configuration#where-codeg-stores-its-data) Codeg then projects that back into conversations exactly the way it projects a built-in agent's native store: the sessions appear in the Conversations list, open with their full transcript, and turn up in [import](/guide/aggregation). A session you opened but never prompted isn't listed, and a session the agent no longer remembers is chained onto its successor so it isn't shown twice.
 
 This is why a custom agent needs no adapter work: the transcript *is* the ACP traffic, and ACP is the same for everyone.
 
@@ -115,7 +117,7 @@ Codeg can't detect where an arbitrary agent loads [skills](/guide/skills) from �
 - **Shared `.agents/skills` store** — the cross-agent convention that OpenCode, Gemini, Cline, Codex, Pi, and Cursor already read (`~/.agents/skills` plus a project-local `.agents/skills`). Ticking it declares *"this agent reads the shared store"* and adds it to every skills matrix.
 - **Dedicated skills directory** — an **absolute** path the agent loads skills from, its own store. `~` expands to your home directory; the field has its own **Save changes** button, so a half-typed path never round-trips.
 
-Either one alone puts the agent on the Experts, Science, Office, and Custom matrices. Set **both** and the dedicated directory is listed first, so linking a skill targets it and leaves the shared store untouched — the same ordering Pi and Cursor use.
+Either one alone puts the agent on the Experts, Science, Office Tools, UI and Custom matrices. Set **both** and the dedicated directory is listed first, so linking a skill targets it and leaves the shared store untouched — the same ordering Pi and Cursor use.
 
 ::: warning Registry-added agents start with neither
 Adding from the catalog leaves both declarations off, because the registry doesn't say where the agent reads skills from. Until you declare one, the agent simply doesn't appear as a column in the skills matrices — which is the honest answer, since a link there could only fail.
@@ -123,11 +125,11 @@ Adding from the catalog leaves both declarations off, because the registry doesn
 
 ## Delegation and MCP
 
-**Delegation works.** A custom agent is `@`-mentionable in the composer and a valid target for [multi-agent collaboration](/guide/multi-agent) — it travels as `custom:<id>` and Codeg appends it to the delegate tool's target list. It also gets its own tab under **Settings → General → Multi-Agent Collaboration → Agent defaults**, probed live like a built-in, so delegated sessions start configured the way you want.
+**Delegation works.** A custom agent is `@`-mentionable in the composer and a valid target for [multi-agent collaboration](/guide/multi-agent) — it travels as `custom:<id>` and Codeg appends it to the delegate tool's target list. It also gets its own tab under **Settings → Collaboration → Multi-Agent Collaboration → Agent defaults**, probed live like a built-in, so delegated sessions start configured the way you want.
 
 Whether it can *lead* a delegation is up to the agent: the delegate tool arrives as an MCP tool over ACP, so an agent that accepts MCP servers over the protocol can delegate, and one that doesn't can only be delegated to.
 
-**MCP servers are not assignable from Settings → MCP.** That screen writes into each agent's *native* config file, and Codeg deliberately knows nothing about a custom agent's — so custom agents aren't offered as targets there. What they do get is what rides the protocol itself: Codeg's own `codeg-mcp` companion, on exactly the same terms as a built-in agent. It's attached whenever at least one of its features is switched on in **Settings → General** — delegation, live feedback, ask-a-question, session lookup, or creating automations and to-dos — and each feature's tools appear only while that feature is on. So `delegate_to_agent` reaches a custom agent once you've [enabled delegation](/guide/multi-agent#turn-it-on), not before. → [MCP Servers](/guide/mcp)
+**MCP servers are not assignable from Settings → MCP.** That screen writes into each agent's *native* config file, and Codeg deliberately knows nothing about a custom agent's — so custom agents aren't offered as targets there. What they do get is what rides the protocol itself: Codeg's own `codeg-mcp` companion, on exactly the same terms as a built-in agent. It's attached whenever at least one of its features is switched on in [Settings → Collaboration](/reference/settings/collaboration) — delegation, live feedback, ask-a-question, session lookup, or creating automations and to-dos — and each feature's tools appear only while that feature is on. So `delegate_to_agent` reaches a custom agent once you've [enabled delegation](/guide/multi-agent#turn-it-on), not before. → [MCP Servers](/guide/mcp)
 
 ### When an agent refuses MCP entirely
 
@@ -151,7 +153,7 @@ Two cards sit at the bottom of a custom agent's detail pane (a **Custom** badge 
 - **Disabled means invisible.** The enable toggle works the same as for a built-in, and since 0.22 it reaches further: a disabled agent is dropped from the delegate tool's target list, not just from the composer picker.
 - **Icons are stored, not linked.** The registry's mark is inlined into the definition when you add it, so the agent list renders offline. A monochrome SVG is masked to follow your theme rather than rendered as-is.
 - **It works on a server too.** The dialog is in the browser build, and the platform key it fills the binary template with is the *server's* — the machine that actually performs installs.
-- **No per-agent quirk handling.** Codeg's built-in agents each carry small adaptations for their non-standard behavior. A custom agent gets plain ACP semantics, live and in history alike — which is exactly why the two never diverge.
+- **No per-agent quirk handling — with one exception.** Codeg's built-in agents each carry small adaptations for their non-standard behavior. A custom agent gets plain ACP semantics, live and in history alike — which is exactly why the two never diverge. The exception, since **0.35.0**, is steering: a custom agent whose adapter reports itself as Claude Code's own, `@agentclientprotocol/claude-agent-acp`, takes [Insert into current turn](/guide/workspace#talk-to-an-agent-mid-turn) directly, under the same version floor as the built-in Claude Code — a second Claude Code account registered as a custom agent, say. Its history is still Codeg's own transcript.
 
 ## Next steps
 

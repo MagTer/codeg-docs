@@ -15,12 +15,12 @@ Codeg gathers every preference into one **Settings** window (its sidebar is head
 
 | Settings screen | What it controls | Documented in |
 | --------------- | ---------------- | ------------- |
-| **Appearance** | Theme mode & color, window zoom, fonts, desktop pet | [Appearance](/reference/settings/appearance) |
-| **General** | Default terminal, command-output colour, rendering, what the close button does, desktop notifications & sounds | [General](/reference/settings/general) |
+| **Appearance** | Theme mode & color, window zoom, fonts, chat animations & width, desktop pet | [Appearance](/reference/settings/appearance) |
+| **General** | Default terminal, command-output colour, rendering, the @ mention panel, what the close button does, desktop notifications, taskbar & Dock alerts, and sounds | [General](/reference/settings/general) |
 | **Collaboration** | Delegation between agents, and the in-conversation tools each agent is given | [Collaboration](/reference/settings/collaboration) |
 | **MCP** | Model Context Protocol servers — add, scan, enable per agent | [Guide → MCP Servers](/guide/mcp) |
 | **Skills** | Write and edit your own agent skills | [Guide → Skills](/guide/skills) |
-| **Skill Packs** | Curated bundles — Experts, Science, Office | [Guide → Skills](/guide/skills#enable-a-curated-skill-pack) |
+| **Skill Packs** | Curated bundles — Experts, Science, Office Tools — plus the UI Render skill and your own | [Guide → Skills](/guide/skills#enable-a-curated-skill-pack) |
 | **Agents** | The agent CLIs — connect, configure, run preflight, and [register your own](/guide/custom-agents) | [Guide → Working with Agents](/guide/agents) |
 | **Model Providers** | API provider credentials for agents | [Guide → Authentication & Models](/guide/authentication) |
 | **Quick Messages** | Reusable message snippets for the composer | [Quick Messages](/reference/settings/quick-messages) |

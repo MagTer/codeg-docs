@@ -5,7 +5,7 @@ description: 使用 codeg-server 或 Docker 在 Linux 或 macOS 服务器上以�
 
 # 部署
 
-**`codeg-server`** 就是以无头方式运行的 Codeg——与桌面应用相同的智能体、会话、频道和[多智能体协作](/zh/guide/multi-agent)，由你掌控的机器提供服务，并可在任意浏览器中访问。只需在一台常开的服务器上部署一次，你的工作区便可从任何设备访问，无需桌面端。每个请求都由访问令牌守护。
+**`codeg-server`** 就是以无头方式运行的 Codeg——与桌面应用相同的智能体、会话、频道和[多智能体协作](/zh/guide/multi-agent)，由你掌控的机器提供服务，并可在任意浏览器中访问。只需在一台常开的服务器上部署一次，你的工作区便可从任何设备访问，无需桌面端。它由访问令牌守护。
 
 ::: tip 只是想偶尔在浏览器中使用桌面应用？
 那你不需要服务器——打开 [Web 服务](/zh/reference/settings/web-service)，正在运行的桌面应用便会通过网络提供自身。当你想让 Codeg 在**没有**桌面端的情况下运行时——常开、无头或共享——再考虑 `codeg-server`。
@@ -40,7 +40,7 @@ docker run -d -p 3080:3080 \
   ghcr.io/spacering-net/codeg:latest
 ```
 
-镜像以多架构（amd64 + arm64）形式发布到 `ghcr.io/spacering-net/codeg` 和 Docker Hub 上的 `xintaofei/codeg`，并以每个版本的版本号作为标签（`:0.34.0`）。`:latest` 只跟随**稳定**版本——候选发布版有自己的版本标签，以 `-rc.N` 结尾，且永远不会移动 `latest`。
+镜像以多架构（amd64 + arm64）形式发布到 `ghcr.io/spacering-net/codeg` 和 Docker Hub 上的 `xintaofei/codeg`，并以每个版本的版本号作为标签（`:0.35.2`）。`:latest` 只跟随**稳定**版本——候选发布版有自己的版本标签，以 `-rc.N` 结尾，且永远不会移动 `latest`。
 
 ::: warning 还在从 `ghcr.io/xintaofei/codeg` 拉取？请换成新名称
 Codeg 的仓库已迁到 `spacering-net/codeg`，自 **0.34.0** 起，GitHub 的镜像仓库改用新名称发布。**`ghcr.io/xintaofei/codeg` 停在 0.33.0**——仍写着它的容器或 Compose 文件会一直拉取那个版本，再也不会更新。把镜像改成 `ghcr.io/spacering-net/codeg` 即可；`codeg-data` 卷与镜像名称无关，数据会一并带过去。Docker Hub 上的 `xintaofei/codeg` 照常更新。
@@ -176,7 +176,8 @@ CODEG_STATIC_DIR=../out ./target/release/codeg-server
 默认情况下，服务器绑定 `0.0.0.0:3080`，因此任何能路由到该主机的设备都可以访问它。这正是远程访问所需要的——但这也意味着**令牌是你唯一的防线**。在公开主机上有几件事要做对：
 
 - **将其置于 HTTPS 之后。** `codeg-server` 使用纯 HTTP 通信，没有内置的 TLS。请在其前面架设一个反向代理——Caddy、nginx 或 Traefik——由它终止 TLS 并转发到 `127.0.0.1:3080`。设置 `CODEG_HOST=127.0.0.1`，使得只有代理（而非整个网络）能够直接访问服务器。
-- **对令牌保密。** 每个 HTTP 和 WebSocket 请求都必须携带它；不存在匿名访问。通过以新的 `CODEG_TOKEN` 重启来轮换它。
+- **对令牌保密。** 每个 API 和 WebSocket 请求都必须携带它，只有少数几类除外：自带凭证的那几种——一次性下载链接、Office 实时预览的单文档能力凭证，以及 forge 的 webhook 推送（改为通过签名验证）——还有不泄露任何东西的应用自身文件和登录页的语言查询。通过以新的 `CODEG_TOKEN` 重启来轮换它。
+- **如果你用 webhook，就要放 forge 进来。** 仓库面板的 [webhook 触发](/zh/guide/repository#set-up-the-webhook)会投递到这台服务器上的 `/api/forge_webhook`，而 forge 只能向它访问得到的地址投递。如果前面挡着一道登录网关——比如 Cloudflare Access——请为这条路径开个例外，否则推送永远到不了 Codeg；每一次推送到达时都会与某个文件夹的密钥比对。→ [Webhook](/zh/reference/privacy#webhooks-for-auto-processing)
 - **桥端口也照此发布。** [端口桥](/zh/guide/browser#in-a-browser-session-the-port-bridge)同样在 `CODEG_HOST` 上绑定 `CODEG_BRIDGE_PORTS`。这些端口只回应从已登录工作台打开过页面的浏览器，但放在 TLS 代理之后时它们同样需要 TLS（工作台用自己的 scheme 访问它们），而 `CODEG_HOST=127.0.0.1` 时它们和主端口一样需要转发。不想运行它就设置 `CODEG_BRIDGE_PORTS=off`。
 - **或者干脆不用这些端口。** 设置了 `CODEG_BRIDGE_HOST_PATTERN`，开发服务器就会在工作台已经在用的那个端口上按名字访问——`3000.codeg.example.com`——因此无需额外发布任何东西，只要有一条泛域名 DNS 记录、并在你的代理上配置一个泛域名虚拟主机，把这些名字送到服务器即可。
 - **决定远端工作区的浏览器能访问什么。** 作为[远端工作区](/zh/guide/browser#in-a-remote-workspace-window)连接到本服务器的桌面应用，会通过服务器承载的一条隧道，在其内置浏览器里打开服务器那一侧的地址——默认可以访问服务器能访问到的任何地方，理由是持有令牌本就能在那里运行命令。`CODEG_BROWSER_TUNNEL=private` 把它限定在回环、私有和链路本地地址——其中仍包括云服务商的元数据地址——而 `off` 则把它关掉。
@@ -195,6 +196,19 @@ CODEG_STATIC_DIR=../out ./target/release/codeg-server
 ::: warning 这些存在数据库里，而不是密钥环里
 一个连接的访问令牌及其自定义请求头，未加密地存放在该连接位于 Codeg SQLite 数据库中的那一行上——这与进入操作系统密钥环的 Git 和聊天凭据不同。任何能读到数据目录的人都能读到它们。→ [隐私与安全](/zh/reference/privacy#where-secrets-are-kept)
 :::
+
+## 把它安装成应用 {#install-it-as-an-app}
+
+网页版可以像应用一样安装。把它添加到手机主屏幕——或者在提供安装选项的桌面浏览器里安装它——它就会在自己独立的窗口中打开，并配有一个满版图标。自 **0.35.0** 起，手机浏览器的地址栏以及 Android 的导航栏会跟随你的浅色或深色主题，而应用的 manifest 会带着你的 cookie 获取，因此在登录代理之后也能正常安装。
+
+自 **0.35.2** 起，它还会**在你的浏览器里保存一份自身的副本**。被浏览器休眠的标签页重新打开时不必再下载一遍 Codeg；而在服务器重启或离线期间刷新页面，显示的会是 Codeg 自己的*连接已断开*界面，带有**立即重连**，而不是浏览器的错误页。保存下来的是应用本身，不含任何属于你的东西：
+
+- **只有构建文件和页面外壳。** 任何 `/api` 调用和实时连接都不会经过这份缓存，所以里面不会存下任何对话、文件或设置——经由[端口桥](/zh/guide/browser#in-a-browser-session-the-port-bridge)显示的开发服务器也会直接穿过它。
+- **只在浏览器允许的地方**——通过 **HTTPS**，或在 `localhost` 上。以纯 `http://` 局域网地址访问服务器的手机不会得到这份副本，桌面应用也从不使用它。
+- **每个版本一份。** 新版本会装上一份新副本，并清掉更早的那些，只留下上一个版本的文件。如果安装无法完成——比如位于一个会把这次请求重定向走的登录代理之后——那就只是没有副本而已，其他一切照旧。
+- **页面仍然先找服务器要。** 只有服务器答不了时——完全连不上，或者服务器出错——页面加载才会用这份副本，所以跳转到登录页的重定向，或服务器实际给出的任何其他答复，都照常通过。构建文件本身在一个版本内不会变，直接从副本里取。
+
+Codeg 没有为它提供开关；要移除这份副本，请在浏览器里清除该站点的数据。
 
 ## 保持服务器更新 {#keep-your-server-up-to-date}
 

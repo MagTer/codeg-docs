@@ -78,7 +78,7 @@ Three other doors lead here:
 
 - **From a message.** Reading a reply and spotting a follow-up? Beside the copy button on any message sits **Create task from message** — it drops that text into a new task, pre-filled with the project folder, and switches you to To-dos.
 - **From an automation, or from the agent itself.** An automation can file a task instead of starting a session, and an agent in a conversation can queue one too, if you've allowed it. → [Automations](/guide/automations#choose-what-a-fire-does)
-- **From a GitHub or GitLab item.** The [Repository panel](/guide/repository) lists your issues and pull requests and hands one straight to an agent, choosing how it should be handled — fix it, plan it first, review it and fix what it finds, or only review it. The task that comes out is an ordinary one on this board. → [Repository Panel](/guide/repository)
+- **From a GitHub, GitLab or Gitea item.** The [Repository panel](/guide/repository) lists your issues and pull requests and hands one straight to an agent, choosing how it should be handled — fix it, plan it first, review it and fix what it finds, or only review it. Since **0.35.2** it can also create them **by itself**, scanning on a schedule or on a webhook for the items that match your rules; those tasks' timelines open with *Created by auto-processing*. Either way the task that comes out is an ordinary one on this board. → [Repository Panel](/guide/repository#let-it-pick-items-up-by-itself)
 
 ## Set it running
 
@@ -92,9 +92,9 @@ Either way the **concurrency limit** applies: tasks beyond it sit in *Queued* an
 
 *Queued* means exactly that and nothing more — waiting for a free slot. Once a task has one, it moves to **Setting up** in the *In progress* column while its worktree is created and its init command runs, which is where a task installing dependencies for three minutes belongs. Cancel is available throughout, and it genuinely stops the install rather than leaving `pnpm install` to finish in the background.
 
-Turn on **Process automatically** in task settings and you don't press anything at all — to-dos claim themselves as capacity appears, and the queue becomes a genuine work queue.
+Turn on **Process automatically** in task settings and you don't press anything at all — to-dos claim themselves as capacity appears, and the queue becomes a genuine work queue. The [Repository panel's auto-processing](/guide/repository#what-happens-to-what-it-creates) is the other standing *Start*: with its **Start right away** on, which is the default, every task it creates is queued the moment it exists.
 
-Cards in the *To do* column also **reorder by dragging**, and that order is what the auto-processor follows. (Reordering needs a single folder selected — order is stored per folder, so a mixed-folder column has nothing to persist.)
+Cards in the *To do* column also **reorder by dragging**, and that order is what the auto-processor follows. (Reordering needs a single folder selected — order is stored per folder, so a mixed-folder column has nothing to persist — and it's off while a [search](#keep-the-board-tidy) is narrowing the board.)
 
 ### Start it at a time you pick
 
@@ -124,7 +124,7 @@ While it works, the agent has two extra tools that exist only inside a task run:
 - **`task_complete`** — the verdict, called once at the end: **success**, **needs_review** (it works, but look at this), or **blocked** (couldn't finish, and why). Success and needs-review send the task to review; blocked marks it failed.
 
 ::: tip These two aren't tied to the Collaboration toggles
-`task_progress` and `task_complete` are injected only into task runs, so they don't depend on delegation, live feedback, or anything else in [Settings → Collaboration](/reference/settings/collaboration). And they're advisory: if the agent never calls `task_complete`, the task still settles normally when its turn ends.
+`task_progress` and `task_complete` are injected only into task runs, so they don't depend on delegation, live feedback, or anything else in [Settings → Collaboration](/reference/settings/collaboration). And they're advisory: if the agent never calls `task_complete`, the task still settles normally when its turn ends — into review, unless the turn [ended on an agent error](#when-a-task-needs-you).
 :::
 
 ## When a task needs you
@@ -134,7 +134,7 @@ A task lands in **Needs you** for four different reasons, and the status on the 
 - **Awaiting input** — the agent is blocked on a permission request, a multiple-choice question, or a plan approval. Nothing progresses until you answer. A task whose agent [delegated](/guide/multi-agent) part of the work says this too when it's the **sub-agent** that got stuck, rather than sitting at *running* while nothing happens.
 - **To review** — it finished. See [below](#review-the-result).
 - **Merging** — the merge is in flight. This is the one state you can't cancel. A task waiting for the slot reads **queued to merge** instead — see [below](#a-second-merge-waits-in-line).
-- **Failed** — the run errored, was interrupted by a restart, or the agent reported **blocked**. **Retry** picks up in the same worktree, told that the previous attempt was interrupted and to carry on; you can add a **note** for that next run.
+- **Failed** — the run errored, was interrupted by a restart, or the agent reported **blocked**. Since **0.35.2** that includes a turn that **ended on an agent error** and left nothing else behind — an upstream `400` after a cut-off tool call, say, which still closes the turn as if it had finished: with no reply, no change and no verdict, the task fails and the card shows **the agent's own message**, its last 4,000 characters. It used to slide quietly into *To review*, or, for a turn that stopped some other way, say only that the agent stopped. A turn that wrote a reply, changed files or reported a verdict goes to review as before. **Retry** picks up in the same worktree, told that the previous attempt was interrupted and to carry on; you can add a **note** for that next run.
 
 **View session** is how you unblock the first one. It opens a read-only live view of the task's agent session — and while it's read-only for *prompting*, it does render the permission dialog and the question card, so this is where you answer. The viewer streams live for a running task and shows the stored transcript for a settled one, split into the phases the task went through: **Task run**, **Retry run**, **Follow-up**, and **Merge**. It opens **nested inside the task drawer** that launched it, so backing out of the transcript returns you to the task rather than to nothing. Since **0.30.3** a file the transcript mentions opens **beside it** rather than in the workspace column the board is covering — a file badge, a Markdown link or **view diff** brings up a read-only viewer next to the messages, with **Open in workspace** one click away. → [the same panel on the canvas](/guide/canvas#a-card-is-a-real-conversation)
 
@@ -277,6 +277,7 @@ The split earns its keep because what belongs in one stage is nothing like what 
 
 ## Keep the board tidy
 
+- **Search** with the **Search tasks** box in the toolbar — since **0.35.2**, on the board and the list alike. It filters as you type, ignores case, and wants **every word** you type to match somewhere: the title, the branches, the folder, the agent, and either the description or, for a task from the [Repository panel](/guide/repository), its repository, item number, item title and URL. **`#12`** is exact — the task numbered 12, or the one made from issue or pull request 12 — while a bare `12` also finds #112. Columns with nothing left say **No matches**, the list offers **Clear search**, Escape clears it too, and the box starts empty each time you open To-dos.
 - **Filter by folder** with the dropdown, by status in list view, and by visibility with the **Filter** menu: **Show canceled** (on by default) and **Show archived** (off). The filter button badges itself when you've moved away from those defaults.
 - **The folder picker searches.** It's the same list the new-conversation composer uses — a search box, and one row per folder reading *alias [ name ]* over its full path. Typing matches the alias, the real directory name **and** the path, so two folders you've aliased alike are still tellable apart, and a folder you know only by its on-disk name is still findable. The task editor's target folder and the settings scope picker use it too.
 - **Archive** takes a task off the board without deleting it, once it's reached an end — done, failed, or canceled; **Archive all** clears everything the Done column is currently showing. An archived card offers exactly one action — **Unarchive**.
@@ -299,7 +300,7 @@ The split earns its keep because what belongs in one stage is nothing like what 
 
 ## Next steps
 
-- [**Repository Panel**](/guide/repository) — turn a GitHub or GitLab issue or pull request into one of these tasks, and send the result back.
+- [**Repository Panel**](/guide/repository) — turn a GitHub, GitLab or Gitea issue or pull request into one of these tasks, by hand or by rule, and send the result back.
 - [**Git & Worktrees**](/guide/git#work-in-parallel-with-worktrees) — the worktree machinery a task is built on, and how to manage the ones it leaves.
 - [**Automations**](/guide/automations#choose-what-a-fire-does) — fire on a schedule and file a to-do instead of a session.
 - [**Working with Agents**](/guide/agents) — the agents, modes, and options a task replays.

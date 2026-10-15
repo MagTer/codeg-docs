@@ -83,6 +83,8 @@ An agent's clicks and keys are delivered **to the window, in the background**: i
 
 Some apps take no input that way — on Windows, anything built on Chromium, **Edge**, **Chrome** and **VS Code** among them. For those an agent may **bring the window to the front** for that one action, then switch back to the window you were in (on Linux it stays in front). You'll see it come forward, and anything you type at that moment may land in it. **Let agents bring windows to the front** is on by default; turn it off and every action stays in the background, and those apps simply don't respond. Actions on the **entire screen** always go to the front, so they need it on.
 
+On **macOS**, a Chromium or Electron app — VS Code, Slack — often doesn't let Codeg read back what was typed into it. Since **0.35.0** typing that went out but can't be confirmed no longer counts as a failure, and when the agent asks for what it typed to be submitted, Return is pressed after it rather than skipped. The agent is told to take a screenshot before it types or presses Return a second time, so it checks rather than repeats.
+
 ## Watch what they do
 
 - **Recent activity** in the popover lists the latest actions, newest first: the time, what was done (*Screenshot*, *Read*, *Click*, *Type*, *Key*, …), the app, and the outcome — **done**, **refused** (no share covered it) or **failed**. Identical repeats fold into one line with a count. Listing apps and windows acts on no window and isn't recorded. **Clear recent activity** empties the list and undoes nothing.

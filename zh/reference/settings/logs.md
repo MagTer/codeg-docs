@@ -59,12 +59,14 @@ description: 运行日志设置界面 —— 设置 Codeg 记录多少内容、�
 
 ## 磁盘上的日志文件 {#log-files-on-disk}
 
-缓冲区只是近期的一段；**完整历史存放在文件中**。Codeg 每天在 **`~/.codeg/logs/`**（如果你设置了 `$CODEG_HOME/logs`，则在那里）下写入一个新文件，按二进制文件和日期命名 —— 桌面应用为 `codeg.<date>.log`，[独立服务器](/zh/getting-started/deployment)为 `codeg-server.<date>.log`。它们是结构化的 **JSON** 行，便于用 grep 或通过 `jq` 处理。Codeg 默认保留**最新的 30** 个（用 `CODEG_LOG_MAX_FILES` 覆盖），并清理较旧的。
+缓冲区只是近期的一段；**完整历史存放在文件中**。Codeg 每天往[数据目录](/zh/getting-started/configuration#where-codeg-stores-its-data)里、数据库旁边的 **`logs/`** 写入一个新文件 —— macOS 上的桌面应用即 `~/Library/Application Support/app.codeg/logs` —— 按二进制文件和日期命名：桌面应用为 `codeg.<date>.log`，[独立服务器](/zh/getting-started/deployment)为 `codeg-server.<date>.log`。`CODEG_HOME` 优先（`$CODEG_HOME/logs`）。`~/.codeg/logs` 只是最后的退路，留给根本没有数据目录的进程——桌面应用和 `codeg-server` 启动时都会设好自己的数据目录。它们是结构化的 **JSON** 行，便于用 grep 或通过 `jq` 处理。Codeg 默认保留**最新的 30** 个（用 `CODEG_LOG_MAX_FILES` 覆盖），并清理较旧的。
+
+自 **0.35.0** 起，桌面应用**无论以何种方式启动**，都写入这同一个文件夹。在此之前，从 Dock 或开始菜单启动时写入 `~/.codeg/logs`，更新后的重新启动则写到数据库旁边，而 **打开文件夹** 打开的始终是后者 —— 所以旧版本留下的日志可能在这两处中的任何一处。
 
 你如何访问它们取决于你在哪里运行：
 
-- **桌面** —— 查看器工具栏中的 **打开文件夹** 按钮会在 Finder / Explorer / 你的文件管理器中显示 `~/.codeg/logs`。直接打开你需要的那一天。
-- **在浏览器中** *（web 模式或服务器）* —— 一个 **日志文件** 面板会列出机器上的文件及其大小，每个都带一个 **下载** 按钮，*“用于查看实时缓冲区之外的历史。”* 单次下载最多返回一个文件最新的 **16 MiB**；更大的文件会作为一个 `.tail.log` 切片返回并附带提示，而完整的文件仍留在磁盘上。
+- **桌面** —— 查看器工具栏中的 **打开文件夹** 按钮会在 Finder / Explorer / 你的文件管理器中显示日志实际正在写入的那个文件夹。直接打开你需要的那一天。
+- **在浏览器中** *（web 模式或服务器）* —— 一个 **日志文件** 面板会列出机器上的文件及其当前大小，每个都带一个 **下载** 按钮，*“用于查看实时缓冲区之外的历史。”* 单次下载最多返回一个文件最新的 **16 MiB**；更大的文件会作为一个 `.tail.log` 切片返回并附带提示，而完整的文件仍留在磁盘上。（在 Windows 主机上，当天正在写入的那个文件在 0.35.0 之前会显示为 0 字节。）
 
 ### 单日日志不会吃光你的磁盘 {#a-day-s-log-can-t-fill-your-disk}
 

@@ -59,12 +59,14 @@ The viewer holds the **newest ~5,000 records** in memory (a rolling buffer, also
 
 ## Log files on disk
 
-The buffer is only the recent tail; the **full history lives in files**. Codeg writes a new file per day under **`~/.codeg/logs/`** (or `$CODEG_HOME/logs` if you've set that), named by binary and date — `codeg.<date>.log` for the desktop app, `codeg-server.<date>.log` for a [standalone server](/getting-started/deployment). They're structured **JSON** lines, easy to grep or pipe through `jq`. Codeg keeps the **most recent 30** by default (override with `CODEG_LOG_MAX_FILES`) and prunes older ones.
+The buffer is only the recent tail; the **full history lives in files**. Codeg writes a new file per day into **`logs/`** beside its database, in the [data directory](/getting-started/configuration#where-codeg-stores-its-data) — for the desktop app on macOS that's `~/Library/Application Support/app.codeg/logs` — named by binary and date: `codeg.<date>.log` for the desktop app, `codeg-server.<date>.log` for a [standalone server](/getting-started/deployment). `CODEG_HOME` takes precedence (`$CODEG_HOME/logs`). `~/.codeg/logs` is only the last resort for a process with no data directory at all — the desktop app and `codeg-server` both set theirs as they start. They're structured **JSON** lines, easy to grep or pipe through `jq`. Codeg keeps the **most recent 30** by default (override with `CODEG_LOG_MAX_FILES`) and prunes older ones.
+
+Since **0.35.0** the desktop app writes to that one folder **however it was started**. Before, a launch from the Dock or the Start menu wrote to `~/.codeg/logs`, a relaunch after an update wrote beside the database, and **Open folder** always showed the second — so logs from an older version may be in either place.
 
 How you reach them depends on where you're running:
 
-- **Desktop** — the **Open folder** button in the viewer toolbar reveals `~/.codeg/logs` in Finder / Explorer / your file manager. Open the day you need directly.
-- **In a browser** *(web mode or a server)* — a **Log files** panel lists the files on the machine with their sizes and a **Download** button each, *"for history beyond the live buffer."* A single download returns at most the newest **16 MiB** of a file; anything larger comes back as a `.tail.log` slice with a heads-up, and the complete file stays on disk.
+- **Desktop** — the **Open folder** button in the viewer toolbar reveals the folder the logs are actually being written to, in Finder / Explorer / your file manager. Open the day you need directly.
+- **In a browser** *(web mode or a server)* — a **Log files** panel lists the files on the machine with their current sizes and a **Download** button each, *"for history beyond the live buffer."* A single download returns at most the newest **16 MiB** of a file; anything larger comes back as a `.tail.log` slice with a heads-up, and the complete file stays on disk. (On a Windows host, the file being written today used to list as 0 bytes until 0.35.0.)
 
 ### A day's log can't fill your disk
 

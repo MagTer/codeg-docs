@@ -1,11 +1,11 @@
 ---
 title: Appearance
-description: The Appearance settings screen — theme mode and accent color, custom theme tokens and CSS, window zoom, per-surface fonts, a workspace background image or GIF, the welcome-screen shortcut cards, and the desktop pet manager.
+description: The Appearance settings screen — theme mode and accent color, custom theme tokens and CSS, window zoom, per-surface fonts, a workspace background image or GIF, the welcome-screen shortcut cards, chat animations and the chat column's width, and the desktop pet manager.
 ---
 
 # Appearance
 
-**Settings → Appearance** controls how Codeg looks: light or dark, the accent color, your own colors on top of it, how large everything is drawn, the fonts used across each surface, an optional background image, and a couple of extras. It's the screen Settings opens on, and every change here saves automatically and applies immediately — no save button, no restart. (One exception: the custom-CSS editor previews live and saves on **Apply**.)
+**Settings → Appearance** controls how Codeg looks: light or dark, the accent color, your own colors on top of it, how large everything is drawn, the fonts used across each surface, an optional background image, how the conversation moves and how wide it runs, and a couple of extras. It's the screen Settings opens on, and every change here saves automatically and applies immediately — no save button, no restart. (One exception: the custom-CSS editor previews live and saves on **Apply**.)
 
 ## Theme mode
 
@@ -118,6 +118,22 @@ The image is saved on disk with Codeg's data, so a background you set on the des
 ## Mode selection area
 
 One switch — **Show on the new conversation page**. It controls whether the **Code Development / Office Work** shortcut cards appear above the composer when you open a fresh conversation. Leave it on for one-click access to the welcome quick actions — they seed a starter prompt for the [Office](/guide/office) and [Research](/guide/research) skills, among others — or turn it off for a bare composer.
+
+## Chat animations
+
+One switch — **Enable chat animations**, **on** by default and new in **0.35.0**. Turn it off and the conversation stops moving: expanding and collapsing, tool-call and working-status animations, a reply folding away, and smooth scrolling all happen at once — the jumps from **Message navigation** and back to a reply's prompt included, and the charts in [reply cards](/guide/skills#cards-tables-and-charts-in-replies) too. Spinners keep turning, since a frozen spinner reads as a hang.
+
+It covers the **conversation area only**; the sidebar, drawers and the rest of the app animate as before. It's applied before the first paint, so a reload with it off doesn't animate even once.
+
+## Chat width
+
+How wide the conversation column and the composer may grow — *"Maximum width of the conversation column and the composer."* New in **0.35.0**.
+
+- **Content width** is a slider from **640 px** up, in steps of 8, reading **Default (768px)** until you move it. **Reset to default** gives it back.
+- **Or drag the column itself.** In a conversation tab each edge of the chat column carries a handle: drag either one outward and the column widens on both sides, **double-click** it to reset, or focus it and use **←** / **→**, 32 px a press, with **Esc** or **Home** to reset. The handles appear only in a window at least 768 px wide.
+- **Measured at 100% zoom.** The width is stored as it would be at 100% [window zoom](#window-zoom) and scales with it, the way the default always did. A value wider than the window can show is held to what fits, with a small margin on each side, without changing what's stored.
+
+The width reaches every surface that draws a transcript — a conversation tab and its welcome page, a [canvas](/guide/canvas) card, a to-do's or a sub-agent's read-only view — but only the conversation tab has the handles. Change it in one window and the others follow.
 
 ## Desktop Pet
 

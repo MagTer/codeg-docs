@@ -11,7 +11,7 @@ The whole thing rides on a document engine called **OfficeCLI** and a matching s
 
 ## Set up OfficeCLI
 
-The office skills are a curated [skill pack](/guide/skills#enable-a-curated-skill-pack), so they live under **Settings → Skill Packs → Office**. Unlike the other packs, they depend on an external binary — **OfficeCLI** (the open-source [iOfficeAI/OfficeCLI](https://github.com/iOfficeAI/OfficeCLI)) — that Codeg installs and drives for you. Three steps, all on that one screen:
+The office skills are a curated [skill pack](/guide/skills#enable-a-curated-skill-pack), so they live under **Settings → Skill Packs → Office Tools**. Unlike the other packs, they depend on an external binary — **OfficeCLI** (the open-source [iOfficeAI/OfficeCLI](https://github.com/iOfficeAI/OfficeCLI)) — that Codeg installs and drives for you. Three steps, all on that one screen:
 
 1. **Install** — one click. Codeg runs OfficeCLI's official installer and streams the log so you can watch it land (`~/.local/bin/officecli` on macOS/Linux, `%LOCALAPPDATA%\OfficeCLI` on Windows). The detection line then reads **Installed**, **Not installed**, or **Installed but not runnable**.
 2. **Sync Skills** — pulls OfficeCLI's document skills into Codeg's shared skill store, so they become enableable.
@@ -60,7 +60,11 @@ The agent calls OfficeCLI to author the file directly in your working folder. As
 
 Open the produced `.docx`, `.xlsx`, or `.pptx` in a workspace file tab and Codeg renders it right there — no export step, no external Office app, no leaving Codeg. The three formats all preview in-tab.
 
-The preview is **live**: as the agent keeps editing the file, it refreshes on its own. Under the hood Codeg runs a lightweight `officecli watch` server for the file and points the tab's preview at it, so the rendered document and the agent's edits never fight over the file on disk — you just watch the deck fill in slide by slide.
+The preview is **live**: as the agent keeps editing the file, it refreshes on its own. Under the hood Codeg runs an `officecli watch` server for the file and points the tab's preview at it, so the rendered document and the agent's edits never fight over the file on disk — you just watch the deck fill in slide by slide.
+
+Since **0.35.2** a file tab's preview **stays live while you look elsewhere**. Switch to another tab and back, and the document is as you left it, scrolled where you were, instead of starting over and reloading. That costs something: every Office tab you've shown keeps its `officecli` process running until you **close the tab** — around 65 MB for a one-paragraph document, more for a real one — and Codeg runs at most 32 at once. Close the documents you're done with.
+
+A large document, or a busy machine, can take a while before its first preview appears, because OfficeCLI renders the whole file before it answers. Codeg now waits up to **two minutes** for that, where it used to give up after eight seconds — and quitting Codeg while a preview is still starting no longer locks that file out of previews for the next five minutes.
 
 You usually don't have to open it at all. **Auto-open preview** — the switch at the top of **Settings → Skill Packs → Office Tools**, **on by default** — opens the live preview by itself the first time an agent creates or edits a Word, Excel or PowerPoint file, so the document appears as it's written rather than after you go looking for it.
 

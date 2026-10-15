@@ -1,6 +1,6 @@
 ---
 title: Skills
-description: Give your agents reusable know-how — enable curated skill packs (Experts, Science, Office) from a shared store, or write your own SKILL.md, then invoke them in any conversation with a slash command.
+description: Give your agents reusable know-how — enable curated skill packs (Experts, Science, Office) and the UI Render skill from a shared store, or write your own SKILL.md, then invoke them in any conversation with a slash command.
 ---
 
 # Skills
@@ -9,20 +9,21 @@ A **skill** is a reusable instruction file — a Markdown `SKILL.md` with a name
 
 Skills are the agent's own feature — each supported agent reads them from its own skills directory. Codeg is the management layer on top, and it gives you two ways to put skills there:
 
-- **Skill packs** — curated bundles Codeg ships (**Experts**, **Science**, **Office**). You enable a pack's skills for the agents you choose, and Codeg links them in.
+- **Skill packs** — curated bundles Codeg ships (**Experts**, **Science**, **Office**), plus **UI Render**, the one skill that lets an agent [answer in cards, tables and charts](#cards-tables-and-charts-in-replies). You enable a pack's skills for the agents you choose, and Codeg links them in.
 - **Your own skills** — write a `SKILL.md` by hand. Author it once in the shared store and switch it on across agents from the same matrix as the packs (**Skill Packs → Custom**), or write it straight into a single agent's own directory (**Skills**).
 
 Either way the result is the same: the skill shows up in that agent's `/` menu, ready to invoke. Both live under adjacent Settings screens — **Skill Packs** and **Skills** — and the rest of this page covers each in turn.
 
 ## Enable a curated skill pack
 
-Open **Settings → Skill Packs**. It's a tabbed hub over three curated, Codeg-managed bundles — plus a **Custom** tab for your own skills ([below](#custom-skills)) — all sharing one **central store** (`~/.codeg/skills`) and one enabling model:
+Open **Settings → Skill Packs**. It's a tabbed hub — **Experts**, **Science**, **Office Tools**, **UI** and **Custom** — over three curated, Codeg-managed bundles, the UI Render skill, and your own skills ([below](#custom-skills)), all sharing one **central store** (`~/.codeg/skills`) and one enabling model:
 
 | Pack | What's in it | Depth |
 | ---- | ------------ | ----- |
 | **Experts** | A software-engineering workflow library (drawn from the open-source *superpowers* collection) — grouped by **discovery**, **planning**, **execution**, **quality**, **debugging**, **review**, and **meta**. | Ready out of the box |
 | **Science** | A research toolkit — **ideation**, **design**, **analysis**, **visualization**, **evaluation**, and **literature**. → [Scientific Research](/guide/research) |
-| **Office** | Document skills that create and edit `.docx`, `.xlsx`, and `.pptx`, powered by the bundled **officecli** tool. → [Office Documents](/guide/office) |
+| **Office Tools** | Document skills that create and edit `.docx`, `.xlsx`, and `.pptx`, powered by the bundled **officecli** tool. → [Office Documents](/guide/office) |
+| **UI** | One skill, **UI Render**, that teaches an agent to answer with interactive cards, tables and charts in Codeg's chat. → [below](#cards-tables-and-charts-in-replies) | Ready out of the box |
 
 ### The skill-and-agent matrix
 
@@ -30,7 +31,7 @@ Each tab shows a grid: skills down the side (grouped by category), your agents a
 
 - A skill's **⋯** menu enables or disables it across **every agent** at once.
 - An agent's column header does the reverse — **every skill** for one agent.
-- **Select** several skills (the checkboxes) to flip a chosen set for a chosen subset of agents, and the top-right **Everything** menu toggles the whole grid.
+- **Select** several skills (the checkboxes) to flip a chosen set for a chosen subset of agents, and the top-right **Bulk** menu — *Enable everything (visible)* or *Disable everything (visible)* — toggles the whole grid.
 - Click a skill's name to open a **preview drawer** — its full `SKILL.md`, plus a per-agent switch list.
 
 Enabling is instant and reversible; disabling in bulk asks first, since it's the destructive direction.
@@ -46,21 +47,43 @@ A cell isn't always a plain on/off. You may see:
 - **Copy mode** *(amber ring)* — the filesystem refused a symlink, so Codeg copied the files instead. It still works; it just won't auto-update in place.
 
 ::: tip Packs update themselves
-Experts (and any bundled skill) are baked into Codeg and re-extracted to the central store when you upgrade — so enabled skills stay current with no action from you. Edit a bundled skill in place and Codeg flags it **user modified** and preserves your version. Science skills may carry a **needs key** or **needs setup** badge — they'll link fine, but the skill itself needs an API key or a Python environment before it runs; see the skill's own instructions and [where credentials live](/guide/authentication#where-credentials-are-stored).
+Experts (and any bundled skill) are baked into Codeg and re-extracted to the central store when you upgrade — so enabled skills stay current with no action from you. Edit an Experts or Science skill in place and Codeg flags it **user modified** and preserves your version. **UI Render** is the exception: Codeg rewrites it whenever it differs from the copy it ships, so an edit there doesn't survive. Science skills may carry a **needs key** or **needs setup** badge — they'll link fine, but the skill itself needs an API key or a Python environment before it runs; see the skill's own instructions and [where credentials live](/guide/authentication#where-credentials-are-stored).
 :::
 
 ### Author your own skills in the shared store {#custom-skills}
 
-The fourth tab, **Custom**, is where your *own* skills live in that same central store — so you write a skill once and enable it across any agent from the matrix, instead of re-creating it in each agent's directory. It behaves like the pack tabs (same grid, same symlink-in), but the skills are yours to edit.
+The last tab, **Custom**, is where your *own* skills live in that same central store — so you write a skill once and enable it across any agent from the matrix, instead of re-creating it in each agent's directory. It behaves like the pack tabs (same grid, same symlink-in), but the skills are yours to edit.
 
 From the Custom tab you can:
 
 - **Create, edit, duplicate, and delete** skills, kept under `~/.codeg/skills`.
 - **Import from a folder** — bring in an existing skill directory. On the desktop that's the native file picker; on the web or a remote workspace it's the server-side directory browser.
-- **Import from an agent** — pull several skills at once out of an agent's own global skills directory into the shared store. The picker lists only that agent's *own* skills; anything already provided by the Experts, Science, or Office packs is filtered out, so you won't re-import a bundled skill.
-- Drop a skill folder into `~/.codeg/skills` yourself, and it shows up on the next **refresh** — anything that isn't part of the Experts, Science, or Office packs counts as a custom skill.
+- **Import from an agent** — pull several skills at once out of an agent's own global skills directory into the shared store. The picker lists only that agent's *own* skills; anything already provided by the Experts, Science, or Office packs — or Codeg's own UI Render — is filtered out, so you won't re-import a bundled skill.
+- Drop a skill folder into `~/.codeg/skills` yourself, and it shows up on the next **refresh** — anything that isn't part of the Experts, Science, or Office packs, or Codeg's own copy of UI Render, counts as a custom skill.
 
 Once a custom skill is in the store, enable it per agent exactly like a pack skill — tick its cells in [the matrix](#the-skill-and-agent-matrix), or fan it out with the **⋯** and column menus.
+
+## Cards, tables and charts in replies
+
+Since **0.35.0** an agent can answer with more than text: a reply can carry **interactive cards and tables** — and since **0.35.1** charts — drawn right in the conversation while it streams. What makes an agent write them is one skill, **UI Render**, on the **UI** tab of Skill Packs. What draws them is Codeg's chat, for every agent, with nothing to switch on.
+
+**Enable it per agent.** The tab is the same skill-and-agent matrix as the others, with a single row — *Generative UI → UI Render* — and a column for every agent that reads skills from somewhere Codeg can write to, custom agents included. Tick the agents you want; each one gets the skill in conversations started after you enable it.
+
+**Then ask.** Start a message with `/ui-render` — `$ui-render` in Codex — and say what you want to see: *"/ui-render list the changed files as a table"*. Or just ask for something as cards, a table or a chart; an agent that has the skill reaches for it when a visual layout helps, and answers in plain Markdown when it doesn't. The skill also tells it to build cards from **real data in the session**, never invented numbers, unless you've asked for a mock-up.
+
+What it teaches is a **`spec`** block in the reply — JSON Patch lines that build up a tree of components from a catalog of shadcn pieces: cards, tables, tabs, accordions, badges, alerts, progress bars, form inputs and buttons, and seven charts — **area, bar, line, pie or donut, radar, radial and scatter**. How that renders:
+
+- **It grows as it streams.** The card fills in while the reply is still being written; a line that hasn't arrived whole is held back rather than drawn half-done.
+- **Only an agent's own reply text is read.** A `spec` block you paste into your message, or one that turns up in a tool's output, stays a code block — and so does one that doesn't parse or fails to render, which falls back to showing its source.
+- **Charts follow your theme**, show their values on hover, and hold still while the reply streams; they animate only with [chat animations](/reference/settings/appearance#chat-animations) on. Since **0.35.1** cards sit flat in the message, with no shadow.
+- **Inputs and buttons stay inside the card.** Nothing is wired back to the agent or the app, so filling in a field or pressing a button changes only that card's own state. A link opens the way any link in the conversation does.
+- **What's drawn stays drawn.** Rendering doesn't depend on the skill, so cards in older replies still render after you disable it, from whichever agent wrote them.
+
+The skill itself is Codeg's: its `SKILL.md` is rewritten from the copy Codeg ships whenever the two differ, so an edit made to it is lost. A skill **of your own** named `ui-render` in the central store is never touched — the tab says the name is taken, badges the row **Name in use**, and asks you to rename yours on the **Custom** tab before the built-in one can be enabled. A real folder of that name in one agent's skills directory blocks only that agent's cell, the same way it would [for a pack skill](#how-enabling-actually-works).
+
+::: info Coming from 0.35.0
+**0.35.0** shipped this behind a single switch, *Generative UI (json-render)*, and the skill was called **json-render**. **0.35.1** replaced the switch with the per-agent matrix and renamed the skill: if you'd had the switch on, the agents that already had json-render get ui-render in its place when you upgrade; if it was off, Codeg's json-render links are cleared away. A json-render skill of your own is left alone either way.
+:::
 
 ## Write your own skill
 
@@ -91,7 +114,7 @@ Save, and it lands right beside the pack-installed skills. From the list you can
 
 ## Invoke a skill in a conversation
 
-Enabled skills surface in the composer the moment you need them. Type **`/`** and they appear in the autocomplete right next to slash commands — pick one to drop it into your message. *(Codex uses **`$`** instead of `/`, matching its own convention.)* The **+** menu also carries shortcuts for the three skill families — Experts, Office, and Research — so you can reach a common skill without remembering its name.
+Enabled skills surface in the composer the moment you need them. Type **`/`** and they appear in the autocomplete right next to slash commands — pick one to drop it into your message. *(Codex uses **`$`** instead of `/`, matching its own convention.)* Since **0.35.0** a command that takes arguments shows what goes after it, as the agent describes it — Codex's `/review-branch` reads *branch name* — in that list, in the **+** menu's *Slash commands* and in the automation editor; picking it still inserts just the command. The **+** menu also carries shortcuts for the three skill families — Experts, Office, and Research — so you can reach a common skill without remembering its name.
 
 Two things to know:
 
@@ -102,7 +125,7 @@ Two things to know:
 
 - **Skills are per agent, not per Codeg.** Enabling one for Claude Code doesn't enable it for Codex — that's the whole point of the matrix. Turn on the same skill for as many agents as you like.
 - **Changes apply on the next session.** A skill is read when the agent starts a conversation; for one that's already open, **Reconnect to apply** picks it up without losing history. → [Configure an agent](/guide/agents#configure-an-agent)
-- **Disabling is safe.** It only removes the link from that one agent — the central copy, and every other agent's link, stay put. Removing a bundled skill entirely takes it out of all agents at once.
+- **Disabling is safe, and thorough.** It never touches the central copy, and a link in another agent's own folder stays put. What it removes is Codeg's link in **every** global skills folder this agent reads — the shared `~/.agents/skills` among them — so a skill another agent was reading from that shared folder goes for both. Removing a bundled skill entirely takes it out of all agents at once.
 - **It works the same on a server.** Both Settings screens are in the browser build; skills live on the machine Codeg runs on.
 - **A custom Pi agent directory opts out.** If you've pointed Pi at a non-default `PI_CODING_AGENT_DIR`, it isn't managed by the shared store and won't appear as a target. → [How agents differ](/guide/supported-agents#how-agents-differ)
 - **A custom agent has to declare where its skills go.** Codeg can't guess where an agent you registered yourself reads skills from, so it appears as a column only once you tick the **shared `.agents/skills` store** or name a **dedicated skills directory** on its settings card. Until then it's left out — a link there could only fail. → [Custom Agents](/guide/custom-agents#give-it-skills)

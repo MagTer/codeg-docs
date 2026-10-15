@@ -91,11 +91,11 @@ Codeg treats agents as something you *run*, not just chat with:
 
 - **[Automations](/guide/automations)** — save a fully-configured setup and run it headlessly, on a cron schedule or on demand.
 - **[To-dos](/guide/tasks)** — write down what needs doing and let agents work through the list, each in its own copy of the code, each waiting for your review before it merges.
-- **[Repository panel](/guide/repository)** — list a project's GitHub or GitLab issues and pull requests, hand one to an agent, and send the result back as a pull request.
+- **[Repository panel](/guide/repository)** — list a project's GitHub, GitLab or Gitea issues and pull requests, hand one to an agent — or let the panel pick matching ones up by itself — and send the result back as a pull request.
 - **[Computer Use](/guide/computer-use)** *(preview)* — share a desktop window, a whole app or the screen with your agents, and let them see it and work in it, with one click to stop them.
 - **[Chat Channels](/guide/chat-channels)** — drive sessions from Telegram, Lark (Feishu), or iLink (Weixin): create tasks, approve permissions, and get real-time replies without opening a browser.
 - **[Anywhere you need it](/getting-started/installation)** — run agents in the desktop app, on a standalone server, or in Docker, then stay connected through the native iOS and Android clients or any browser.
-- **[Extensible](/guide/mcp)** — MCP servers and [Skills](/guide/skills) add tools and expertise, while bundled [Office](/guide/office) and [Scientific Research](/guide/research) toolsets give agents real-world capabilities. New projects start from [Project Boot](/guide/project-boot).
+- **[Extensible](/guide/mcp)** — MCP servers and [Skills](/guide/skills) add tools and expertise, while bundled [Office](/guide/office) and [Scientific Research](/guide/research) toolsets give agents real-world capabilities, and [UI Render](/guide/skills#cards-tables-and-charts-in-replies) lets them answer in cards, tables and charts. New projects start from [Project Boot](/guide/project-boot).
 
 <div class="light-only">
 
@@ -114,7 +114,7 @@ Codeg treats agents as something you *run*, not just chat with:
 Codeg is deliberately un-opinionated about *which* agent you should use, and careful about your data:
 
 - **Agent-agnostic.** New agents plug in through ACP rather than bespoke integrations, so the workspace grows as the ecosystem does.
-- **Local-first.** Parsing, storage, and project operations happen on your machine by default; network calls occur only on actions you trigger. See [Privacy & Security](/reference/privacy).
+- **Local-first.** Parsing, storage, and project operations happen on your machine by default; network calls happen only for something you set in motion. See [Privacy & Security](/reference/privacy).
 - **One core, four binaries.** A shared Rust core powers the desktop app, the standalone server, the MCP companion and the computer-use helper alike; native mobile clients connect to that core over its authenticated API. See the [Architecture](/reference/architecture).
 
 Codeg stands on the shoulders of open work — the [Agent Client Protocol](https://agentclientprotocol.com) for agent connectivity, [Superpowers](https://github.com/obra/superpowers) for expert skills, [OfficeCLI](https://github.com/iOfficeAI/OfficeCLI) for documents, and [scientific-agent-skills](https://github.com/K-Dense-AI/scientific-agent-skills) for research.

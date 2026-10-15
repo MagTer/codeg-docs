@@ -60,7 +60,7 @@ On by default. Puts **Open inspector** in a tab's **⋯** menu and allows *Inspe
 
 ## Tab surface
 
-*Automatic*, *Embedded in the workspace* or *Separate window*. Leave it on Automatic unless embedded tabs misbehave on your system; Linux always uses separate windows. Applies to tabs opened from now on.
+*Automatic*, *Embedded in the workspace* or *Separate window*. Leave it on Automatic, which embeds tabs in the workspace, unless they misbehave on your system. That includes Linux since **0.35.2**, on X11 and Wayland alike — until then it always used separate windows. Applies to tabs opened from now on.
 
 ## Unload background tabs
 

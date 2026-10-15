@@ -28,7 +28,7 @@ Codeg 在两个地方进行配置。桌面应用和 Web 界面通过 **设置** 
 | -------- | ------- | ----------- |
 | `CODEG_PORT` | `3080` | HTTP 和 WebSocket 监听端口。 |
 | `CODEG_HOST` | `0.0.0.0` | 绑定地址——一个 IP、`localhost` 或带方括号的 IPv6 字面量。`0.0.0.0` 会在每个接口上暴露它。 |
-| `CODEG_TOKEN` | *（随机）* | 每个请求都需要的访问令牌。若未设置，则会生成一个、保存到数据库，并在启动时打印到 stderr。 |
+| `CODEG_TOKEN` | *（随机）* | 每个 API 和 WebSocket 请求都需要的访问令牌。例外的那几类要么自带凭证——一次性下载链接、Office 实时预览的单文档能力凭证、forge [经过签名的 webhook 推送](/zh/reference/privacy#webhooks-for-auto-processing)——要么不泄露任何东西：Web 应用自身的文件，以及登录页的语言查询。若未设置，则会生成一个、保存到数据库，并在启动时打印到 stderr。 |
 | `CODEG_DATA_DIR` | *（因操作系统而异——见下文）* | 数据库、上传文件、日志和密钥的根目录。 |
 | `CODEG_STATIC_DIR` | `./web` | 要提供服务的捆绑 Web 界面所在目录。 |
 | `CODEG_MCP_BIN` | *（自动）* | 当 `codeg-mcp` 伴生程序不在服务器二进制文件旁边时其所在路径——某些源码构建需要它。没有它，[多智能体委派](/zh/guide/multi-agent)会被静默禁用。 |
@@ -91,7 +91,7 @@ Codeg 会将按天轮转的日志写入数据目录中的 `logs/`，并将它们
 
 ## 代理支持 {#proxy-support}
 
-启动时，Codeg 会对标准的 `HTTP_PROXY`、`HTTPS_PROXY` 和 `ALL_PROXY` 变量（及其小写形式）拍下快照，并将它们传播给它启动的每一个智能体进程。因此，一处代理设置就同时覆盖了 Codeg *以及*它所驱动的智能体——这正是为企业网关设计的路径。自 **0.32.2** 起，每个带着代理启动的智能体，其 `NO_PROXY` 里还会被加入本机地址——`localhost`、`127.0.0.1`、`::1`——这样智能体连向自己本地服务的连接，永远不会被送到另一台机器上的代理那里；[设置 → 系统](/zh/reference/settings/system#network-proxy)里的**不走代理的地址**列表还可以加上你自己的地址。那份列表里、或你导出的 `NO_PROXY` 里的 `*`，会被单独传出去，表示*全部绕过代理*——而 Antigravity **1.3.0** 不再完全遵守它；原因见同一页。关于 Codeg 如何处理网络访问，参见[隐私与安全](/zh/reference/privacy)。
+启动时，Codeg 会对标准的 `HTTP_PROXY`、`HTTPS_PROXY` 和 `ALL_PROXY` 变量（及其小写形式）拍下快照，并将它们传播给它启动的每一个智能体进程。因此，一处代理设置就同时覆盖了 Codeg *以及*它所驱动的智能体——这正是为企业网关设计的路径。自 **0.32.2** 起，每个带着代理启动的智能体，其 `NO_PROXY` 里还会被加入本机地址——`localhost`、`127.0.0.1`、`::1`——这样智能体连向自己本地服务的连接，永远不会被送到另一台机器上的代理那里；[设置 → 系统](/zh/reference/settings/system#network-proxy)里的**不走代理的地址**列表还可以加上你自己的地址。那份列表里、或你导出的 `NO_PROXY` 里的 `*`，会被单独传出去，表示*全部绕过代理*——而 Antigravity 从 **1.3.0** 起不再完全遵守它；原因见同一页。关于 Codeg 如何处理网络访问，参见[隐私与安全](/zh/reference/privacy)。
 
 ## 高级调优 {#advanced-tuning}
 
@@ -137,7 +137,7 @@ Codeg 会将按天轮转的日志写入数据目录中的 `logs/`，并将它们
 
 ## 智能体自身的设置 {#your-agents-own-settings}
 
-Codeg 通过*每个智能体*自己的环境变量来找到它现有的会话——`CLAUDE_CONFIG_DIR`、`CODEX_HOME`、`GEMINI_CLI_HOME` 等等。如果你已将某个智能体 CLI 指向非默认位置，Codeg 会自动跟随它。完整的映射见[支持的智能体](/zh/guide/supported-agents)。
+Codeg 通过*每个智能体*自己的环境变量来找到它现有的会话——`CLAUDE_CONFIG_DIR`、`CODEX_HOME`、`GEMINI_CLI_HOME` 等等。如果你已将某个智能体 CLI 指向非默认位置，Codeg 会自动跟随它——无论这个变量是设在 Codeg 自己的环境里，还是自 **0.35.2** 起、设在设置 → 智能体中该智能体的**环境变量**里，后者优先。完整的映射见[支持的智能体](/zh/guide/supported-agents#where-each-agent-keeps-its-sessions)。
 
 ## 后续步骤 {#next-steps}
 

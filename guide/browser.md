@@ -5,7 +5,7 @@ description: Web pages open as tabs beside your files in the desktop app — lin
 
 # Built-in Browser
 
-Agents hand you links all day: the dev server they just started, the docs page they quoted, the pull request they opened. In the **desktop app** those pages open **inside Codeg**, as tabs in the file pane next to your code, instead of throwing you out to another application. The page is a real browser engine — the same WebKit as Safari on macOS, WebView2 on Windows — with its own cookies, its own history and its own address bar. Nothing about the engine is emulated: even the [tablet and phone views](#view-a-page-as-a-tablet-or-phone) change only the size the page is laid out at.
+Agents hand you links all day: the dev server they just started, the docs page they quoted, the pull request they opened. In the **desktop app** those pages open **inside Codeg**, as tabs in the file pane next to your code, instead of throwing you out to another application. The page is a real browser engine — the same WebKit as Safari on macOS, WebView2 on Windows, WebKitGTK on Linux — with its own cookies, its own history and its own address bar. Nothing about the engine is emulated: even the [tablet and phone views](#view-a-page-as-a-tablet-or-phone) change only the size the page is laid out at.
 
 Because the page is in the app, it is also a surface you and an agent can share: you can [hand a page, an element, a screenshot or a console error into the conversation](#hand-a-page-to-the-conversation), and you can [let an agent read and drive a page you have shared](#let-an-agent-work-on-the-page), with everything it does written on the tab where you can watch it.
 
@@ -73,7 +73,7 @@ A device view changes the page's **viewport** and nothing else. The page keeps t
 
 - **Each tab keeps its device** — when it's unloaded in the background, across a restart, and when you reopen it with ⇧⌘T, unless that address is already open in another tab of the same profile, which is brought forward instead. A new tab starts on Desktop, whoever opened it: you, a link, a pop-up or an agent. No browser tool can change a tab's device.
 - **In the pane, the page's zoom is Codeg's while a device is on.** It's reapplied every time the frame is fitted, so a zoom you apply in the page yourself — Ctrl+wheel on Windows — is undone at the next fit; switching back to Desktop returns the page to 100% once and leaves the zoom to you again.
-- **A tab in its own window** — on Linux, or with **Tab surface** set to *Separate window* — isn't framed. The window itself is resized so the page area matches the device at full size, and going back to Desktop gives the window its earlier size. The size, or Custom's two fields, moves to the tab's card in the pane, the one reading *This page is shown in its own window*. The window's page zoom is left as you set it, so keep it at 100% when the exact size matters.
+- **A tab in its own window** — with **Tab surface** set to *Separate window*, which until **0.35.2** was every tab on Linux — isn't framed. The window itself is resized so the page area matches the device at full size, and going back to Desktop gives the window its earlier size. The size, or Custom's two fields, moves to the tab's card in the pane, the one reading *This page is shown in its own window*. The window's page zoom is left as you set it, so keep it at 100% when the exact size matters.
 - **In a browser session**, a [port-bridge](#in-a-browser-session-the-port-bridge) tab has the same button, ahead of **Reload**. There the frame is scaled down rather than zoomed, so the page always lays out at the full device size and the *Pane too small* line never appears.
 
 ## A server you start in a terminal
@@ -99,7 +99,7 @@ An `.html` file opened in the file pane — a report an agent wrote, a generated
 - **Edits.** The view shows the file as saved; unsaved edits in the editor are not reflected until you save, and a saved file reloads by itself.
 - **The inline preview is still there.** The view's **⋯** menu has **Use inline preview** for this file, and **Settings → Browser Use → HTML file previews** turns the document view off for every file (the web app always uses the inline preview).
 
-The document view is available on macOS and Windows; Linux keeps the inline preview until its embedded surface has been verified. A document view is never [shared with an agent](#let-an-agent-work-on-the-page): it is not listed to one and cannot be granted, whatever address the platform happens to give it.
+The document view is available on macOS and Windows. Linux keeps the inline preview: its tabs embed in the workspace since **0.35.2**, but the private address scheme a document view is served from can't yet be registered for them there. A document view is never [shared with an agent](#let-an-agent-work-on-the-page): it is not listed to one and cannot be granted, whatever address the platform happens to give it.
 
 ## Hand a page to the conversation
 
@@ -225,7 +225,7 @@ You can have more than one profile — a second set of cookies and sign-ins, for
 
 Browser tabs use the proxy configured under **Settings → System → Network proxy**, the same one the app and the agents use. On macOS this needs **version 14 or later**: before it, browser tabs cannot be proxied at all, and with a proxy configured a tab **refuses to open** rather than reaching the network around it — the settings row says as much. Where it is supported, the change applies to open tabs at their next connection; on Linux to tabs opened afterwards; on Windows after a restart (WebView2 fixes its proxy when the first browser tab of a process is created). Addresses on this machine — `localhost`, `127.0.0.1`, `::1` — never go through the proxy, so a dev server keeps working whatever the proxy would do with it. `http://` and `socks5://` proxies are supported; an `https://` proxy is not.
 
-The **Web inspector** switch in the same settings section is **on by default**: it puts **Open inspector** in a tab's **⋯** menu and allows *Inspect Element* in the page's own right-click menu. The inspector opens **in a window of its own** rather than docking into the tab — docked, it would take half the file pane and squeeze the page into a corner, which for a browser tab is the wrong trade. Codeg registers that as the preference rather than forcing it, so a dock or undock **you** perform from the inspector's own toolbar is remembered by the engine and wins from then on. Like **Tab surface** below it, the switch applies to tabs opened from then on, because a webview cannot be made inspectable after it exists. **Tab surface** decides how pages are hosted: keep *Automatic* unless embedded tabs misbehave on your system — *Separate window* opens each tab as its own window, which is also what Linux uses.
+The **Web inspector** switch in the same settings section is **on by default**: it puts **Open inspector** in a tab's **⋯** menu and allows *Inspect Element* in the page's own right-click menu. The inspector opens **in a window of its own** rather than docking into the tab — docked, it would take half the file pane and squeeze the page into a corner, which for a browser tab is the wrong trade. Codeg registers that as the preference rather than forcing it, so a dock or undock **you** perform from the inspector's own toolbar is remembered by the engine and wins from then on. Like **Tab surface** below it, the switch applies to tabs opened from then on, because a webview cannot be made inspectable after it exists. **Tab surface** decides how pages are hosted: keep *Automatic* unless embedded tabs misbehave on your system — *Separate window* opens each tab as its own window, which until **0.35.2** was the only way Linux could show one.
 
 ## In a browser session: the port bridge
 
@@ -267,16 +267,18 @@ Remote tabs have no profile menu and no *Open in system browser*. → [Privacy &
 
 | | macOS | Windows | Linux |
 | --- | --- | --- | --- |
-| Pages are hosted | embedded in the workspace | embedded in the workspace | in a separate window per tab |
-| Failure messages | by kind (not found / not secure / cannot connect) | by kind, except a name that cannot be found | one generic message |
-| Last frame under overlays | yes | yes | n/a |
-| Find in page | yes | yes | not yet |
+| Pages are hosted | embedded in the workspace | embedded in the workspace | embedded in the workspace, on X11 and Wayland — since 0.35.2 |
+| Failure messages | by kind (not found / not secure / cannot connect) | by kind, except a name that cannot be found | by kind, with a name that cannot be found told apart only when the engine reports it so |
+| Last frame under overlays | yes | yes | yes |
+| Find in page | yes | yes | yes |
 | HTML document view | yes | yes | not yet (inline preview) |
 | Profiles besides the default | macOS 14 and later | yes | yes |
 | Google sign-in identity | yes (embedded tabs) | yes (embedded tabs) | not yet |
 | Proxy changes apply | to open tabs | after a restart | to new tabs |
 | Remote-workspace tabs | macOS 14 and later | yes | yes |
-| Tablet, phone and custom views | framed in the pane | framed in the pane | the tab's window is resized |
+| Tablet, phone and custom views | framed in the pane | framed in the pane | framed in the pane |
+
+Until **0.35.2**, Linux opened every tab as a window of its own; now its tabs sit in the file pane like everyone else's — each tab you open in a web process of its own, while a pop-up shares its opener's — and keyboard focus goes back to the workspace when an overlay covers a page you were typing in. *Separate window* under **Tab surface** is still there on all three platforms for a system where embedding misbehaves.
 
 Sharing a page with an agent, handing one to the conversation, and the local-server menu work the same on all three.
 

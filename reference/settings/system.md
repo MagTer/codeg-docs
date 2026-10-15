@@ -47,8 +47,8 @@ The address takes an `http`, `https`, or `socks5` URL — the placeholder is `ht
 
 **Bypass proxy for** lists what should connect directly instead — new in **0.32.2**. Separate entries with commas and no spaces: `example.com` matches that domain, `.example.com` every subdomain of it, and IP addresses work too. The local addresses — `localhost`, `127.0.0.1`, `::1` — always connect directly and needn't be listed. The field saves when you leave it, and while the proxy is on the list takes effect as the `NO_PROXY` environment variable, for Codeg and for every agent it launches. A `*` anywhere in it means *bypass everything*, and Codeg then passes `*` on by itself, because Python and curl honour `*` only as the whole value.
 
-::: warning `*` doesn't fully bypass Antigravity 1.3.0
-**Antigravity 1.3.0**, pinned since **0.34.0**, adds the local addresses to `NO_PROXY` itself whenever a proxy is set. That turns a lone `*` into `*,localhost,127.0.0.1,::1` — a list, in which Python skips the `*`. So with a proxy configured and a `*` in this list, or in a `NO_PROXY` you export yourself, some of Antigravity's own requests — the ones its Python service makes — go **through the proxy** again. To keep them direct, list the hosts they need instead of `*`.
+::: warning `*` doesn't fully bypass Antigravity 1.3.0 and later
+**Antigravity 1.3.0**, pinned from **0.34.0**, and **1.4.0**, pinned since **0.35.2**, add the local addresses to `NO_PROXY` themselves whenever a proxy is set. That turns a lone `*` into `*,localhost,127.0.0.1,::1` — a list, in which Python skips the `*`. So with a proxy configured and a `*` in this list, or in a `NO_PROXY` you export yourself, some of Antigravity's own requests — the ones its Python service makes — go **through the proxy** again. To keep them direct, list the hosts they need instead of `*`.
 :::
 
 That local exception also applies to a proxy you set from **outside** Codeg, and it's what lets **OpenCode** and **Antigravity** work behind a proxy on another machine: both talk to a local service of their own, and until **0.32.2** those connections were sent to the proxy too, failing with *OpenCode service failure* or *Failed to connect to WebSocket*.
@@ -69,7 +69,7 @@ A portable snapshot of your Codeg install — *"Export a portable backup of your
 
 Export writes a single `.codegbak` archive of your **database and uploads**. Two choices shape it:
 
-- **Include conversation content** *(off by default)* — *"Also archive agent CLI transcripts (Claude, Codex, Gemini, …). Increases size."* Off, the backup is your Codeg data alone; on, it also pulls in the underlying agent CLIs' own transcript files.
+- **Include conversation content** *(off by default)* — *"Also archive agent CLI transcripts (Claude, Codex, Gemini, …). Increases size."* Off, the backup is your Codeg data alone; on, it also pulls in the underlying agent CLIs' own transcript files. Since **0.35.0** that includes Codex's session index, where every Codex conversation's **name** lives — a backup made before it lacks the index, so a Codex conversation restored from one can come back named after its first prompt.
 - **Passphrase** *(optional)* — encrypt the archive. Leave it empty and Codeg warns, in amber, that *"this backup will contain secrets (API keys, tokens) in plaintext"* — because it does; store it somewhere safe. Set one and the opposite caution applies: *"if you lose it, the backup cannot be recovered."*
 
 **Export backup** builds it — the desktop app saves a file, a browser session downloads one.
@@ -82,10 +82,11 @@ Some agents keep their sessions in **SQLite**, which can't simply be copied whil
 
 Restoring is a **full replace**, and the panel says so plainly, in red: *"Restoring replaces all current codeg data (database and uploads). Your current data is snapshotted first so it can be recovered."* You confirm through a **Replace all data?** dialog, after which Codeg stages the restore and restarts to apply it.
 
-Two things worth knowing before you do:
+Three things worth knowing before you do:
 
 - **Desktop backups don't carry your keychain secrets.** *"Desktop GitHub/chat tokens live in your OS keychain and are not included; re-enter them after restoring."* On a **server**, those same tokens live in a file that *is* in the backup — the difference is exactly the keyring split described under [Version Control](/reference/settings/version-control).
 - **Restoring conversation content is its own choice.** If the backup included the agent CLI transcripts, you pick where they land — skip them, drop them in a **safe side folder**, or write them back to the **original CLI locations** (with a conflict scan and an optional overwrite) so the agents see their history again.
+- **Two session lists are merged, not replaced.** Codex's and Kimi Code's session indexes — the one that names each Codex conversation, the one that records which folder each Kimi session belongs to — are append-only files the CLIs keep adding to. Since **0.35.0** a restore to the original locations **adds** the backup's entries for every session the live file doesn't know, rather than skipping the whole file as a conflict or overwriting it, so restored conversations keep their names and folders and a CLI that's running loses nothing. With overwrite on, the backup's entry also wins for a session whose entry differs.
 
 #### Pre-restore snapshots
 
@@ -93,7 +94,7 @@ The snapshot the warning mentions isn't a figure of speech — it's a listed thi
 
 A snapshot carrying the manifest that records what was *absent* before the restore offers **Roll back to this**; one written before that manifest existed is listed as **Inspect only**, because without that list a rollback couldn't tell *leave this alone* from *this didn't exist, remove it*. Rolling back replaces your current data with the snapshot and restarts, and — the part that makes it safe to try — **snapshots the data it's replacing on the way**, so the rollback is itself reversible.
 
-A restore also reports what it did instead of leaving you to guess: **Restore staged**, with counts for files kept because you didn't opt into overwriting, session databases that couldn't be written back, and — when agents were running and their transcripts went to a side folder instead of their original locations — which agents and which path.
+A restore also reports what it did instead of leaving you to guess: **Restore staged**, with counts for files kept because you didn't opt into overwriting — a merged session index isn't one of them — session databases that couldn't be written back, and — when agents were running and their transcripts went to a side folder instead of their original locations — which agents and which path.
 
 ::: warning Backup acts on this machine
 Backup and restore operate on the data of the machine actually running Codeg. If you're in a desktop app **connected to a remote workspace**, the panel is disabled with a note to *"manage its backups from that server directly"* — the native file dialogs here wouldn't line up with the remote server's storage.
