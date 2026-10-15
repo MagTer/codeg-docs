@@ -84,6 +84,8 @@ Codeg stands on excellent open-source work. Our thanks to the projects it builds
 - [**Superpowers**](https://github.com/obra/superpowers) — powers Codeg's expert skills module.
 - [**OfficeCLI**](https://github.com/iOfficeAI/OfficeCLI) — powers the [Office Documents](/guide/office) workflow.
 - [**scientific-agent-skills**](https://github.com/K-Dense-AI/scientific-agent-skills) — the MIT-licensed subset behind Codeg's [Scientific Research](/guide/research) skills.
+- [**json-render**](https://github.com/vercel-labs/json-render) — powers the cards, tables and charts of [UI Render](/guide/skills#cards-tables-and-charts-in-replies).
+- [**cua-driver**](https://github.com/trycua/cua) — powers [Computer Use](/guide/computer-use).
 
 ## License
 

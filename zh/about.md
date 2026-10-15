@@ -84,6 +84,8 @@ Codeg 立足于优秀的开源成果。感谢它所依赖的这些项目：
 - [**Superpowers**](https://github.com/obra/superpowers) —— 为 Codeg 的专家技能模块提供支持。
 - [**OfficeCLI**](https://github.com/iOfficeAI/OfficeCLI) —— 为 [Office 文档](/zh/guide/office)工作流提供支持。
 - [**scientific-agent-skills**](https://github.com/K-Dense-AI/scientific-agent-skills) —— Codeg [科学研究](/zh/guide/research)技能背后采用 MIT 许可的子集。
+- [**json-render**](https://github.com/vercel-labs/json-render) —— 为[界面渲染](/zh/guide/skills#cards-tables-and-charts-in-replies)的卡片、表格与图表提供支持。
+- [**cua-driver**](https://github.com/trycua/cua) —— 为[电脑操作](/zh/guide/computer-use)提供支持。
 
 ## 许可证 {#license}
 
