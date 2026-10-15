@@ -29,13 +29,6 @@ Codeg 的开发由下列赞助商支持。如果他们所提供的服务契合�
     </tr>
     <tr>
       <td align="center" width="210">
-        <a href="https://console.lqapi.xyz/sign-up?aff=KPy9" target="_blank" rel="noreferrer"><img src="/images/lq-router.png" alt="LQ router" style="max-width: 190px; max-height: 80px;" /></a><br/>
-        <strong><a href="https://console.lqapi.xyz/sign-up?aff=KPy9" target="_blank" rel="noreferrer">LQ router</a></strong>
-      </td>
-      <td>感谢 <a href="https://console.lqapi.xyz/sign-up?aff=KPy9" target="_blank" rel="noreferrer">LQ router 中转站</a> 赞助 Codeg！LQ router 是一家专业的企业级 AI 中转站，为企业和个人开发者提供稳定、高效、低成本的 AI 模型 API 接入服务。平台支持 GPT、Claude、Grok、Gemini 等主流模型，GPT Pro 倍率低至 0.1。<a href="https://console.lqapi.xyz/sign-up?aff=KPy9" target="_blank" rel="noreferrer">通过官网进群</a>即可获得 1 美元体验额度。</td>
-    </tr>
-    <tr>
-      <td align="center" width="210">
         <a href="https://go.apimart.ai/gh-codeg" target="_blank" rel="noreferrer"><img src="/images/apimart-ai.png" alt="APIMart" style="max-width: 190px; max-height: 80px;" /></a><br/>
         <strong><a href="https://go.apimart.ai/gh-codeg" target="_blank" rel="noreferrer">APIMart</a></strong>
       </td>
@@ -50,10 +43,10 @@ Codeg 的开发由下列赞助商支持。如果他们所提供的服务契合�
     </tr>
     <tr>
       <td align="center" width="210">
-        <a href="https://fluxionai.space/register?source=github&amp;campaign=github-codeg-202609&amp;promo=CODEG" target="_blank" rel="noreferrer"><img src="/images/fluxion-ai.png" alt="Fluxion AI" style="max-width: 190px; max-height: 80px;" /></a><br/>
-        <strong><a href="https://fluxionai.space/register?source=github&amp;campaign=github-codeg-202609&amp;promo=CODEG" target="_blank" rel="noreferrer">Fluxion AI</a></strong>
+        <a href="https://fluxionai.space/register?source=github&amp;campaign=github-sidrune-codeg&amp;promo=SDRCODEG" target="_blank" rel="noreferrer"><img src="/images/sidrune-ai.png" alt="Sidrune AI" style="max-width: 190px; max-height: 80px;" /></a><br/>
+        <strong><a href="https://fluxionai.space/register?source=github&amp;campaign=github-sidrune-codeg&amp;promo=SDRCODEG" target="_blank" rel="noreferrer">Sidrune AI</a></strong>
       </td>
-      <td>感谢 <a href="https://fluxionai.space/register?source=github&amp;campaign=github-codeg-202609&amp;promo=CODEG" target="_blank" rel="noreferrer">Fluxion AI</a> 赞助 Codeg！Fluxion AI 通过一个统一的 API，提供快速、可靠、高性价比的 GPT、Claude、Gemini 等领先 AI 模型接入。新用户通过<a href="https://fluxionai.space/register?source=github&amp;campaign=github-codeg-202609&amp;promo=CODEG" target="_blank" rel="noreferrer">我们的专属链接</a>注册可获得 3 美元 API 额度。</td>
+      <td>感谢 <a href="https://fluxionai.space/register?source=github&amp;campaign=github-sidrune-codeg&amp;promo=SDRCODEG" target="_blank" rel="noreferrer">Sidrune AI</a> 赞助 Codeg！Sidrune AI 通过一个 API 接入 GPT、Claude 等主流 AI 模型。新用户通过<a href="https://fluxionai.space/register?source=github&amp;campaign=github-sidrune-codeg&amp;promo=SDRCODEG" target="_blank" rel="noreferrer">我们的专属链接</a>注册时使用优惠码 <code>SDRCODEG</code>，即送 3 美元 API 额度。</td>
     </tr>
     <tr>
       <td align="center" width="210">
