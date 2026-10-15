@@ -53,7 +53,7 @@ Unless you set `CODEG_DATA_DIR`, `codeg-server` keeps its data in the platform d
 The desktop app stores the same kind of data in the same place, under an `app.codeg` folder. Inside the data directory you'll find:
 
 - **`codeg.db`** — the SQLite database: sessions, settings, channels, automations — effectively all of Codeg's state.
-- **`uploads/`** — files attached from the web client.
+- **`uploads/`** — files uploaded as attachments in a browser or a remote-workspace window.
 - **`pets/`** — desktop-pet assets.
 - **`logs/`** — rotating daily log files (see [Logging](#logging)).
 - **`tokens.json`** — the server's encrypted secret store (git credentials and the like). On the desktop these live in your OS keyring instead, so this file is server-only.
@@ -66,7 +66,7 @@ Installed skills are kept under `~/.codeg/skills/`, which follows `CODEG_HOME` (
 
 ## Storage limits
 
-By default an upload's only ceiling is your disk. To bound it:
+By default the total size of uploads is limited only by your disk. To bound it:
 
 | Variable | Default | Description |
 | -------- | ------- | ----------- |
@@ -74,7 +74,7 @@ By default an upload's only ceiling is your disk. To bound it:
 | `CODEG_UPLOAD_QUOTA_STRICT` | *(off)* | When truthy (`1` / `true` / `yes` / `on`), refuse to start (exit code 2) if the quota above is set but unparseable, instead of falling back to "no cap" with a warning. Use it when policy requires a configured quota to actually take effect. |
 | `CODEG_BACKUP_UPLOAD_MAX_BYTES` | *(no cap)* | Largest backup archive the restore endpoint will accept. |
 
-Each individual attachment is additionally capped at **2 MiB** — a fixed limit, not configurable.
+Each file you upload as an attachment in a browser or a remote-workspace window is also capped at **20 MiB** — a fixed limit, not configurable. A larger file is skipped with a message naming it, and the others still attach. A file that's already on the server, such as one you choose with **Pick server file**, is attached by its path on the server, so the cap doesn't apply to it. Before **0.22.0** the cap was 2 MiB.
 
 ## Logging
 
