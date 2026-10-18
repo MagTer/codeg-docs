@@ -48,11 +48,11 @@ Codeg 并不重新实现 Claude Code、Codex、Gemini 等等 —— 它**驱动�
 
 在这一关系中，Codeg 是**客户端**，智能体是**服务器**：Codeg 打开一个会话，将模型的这一轮流式传回你的屏幕，并在智能体的请求到达时逐一响应 —— 在**终端**中运行命令、**读取或写入文件**、为有风险的操作请求**权限**。对于 Codeg 不处理的请求，它会回一个*不支持*的答复，这样智能体就能继续往下走，而不是干等着。由于每个智能体都被规范化到同一套协议上，它们全都落入单一的工作区、置于同一套控制之下 —— 这正是聚合对话、在智能体之间切换得以实现的根本所在。
 
-当 Codeg 启动一个智能体时，它还会给智能体一组待连接的 **MCP 服务器**。其中之一始终是 Codeg 自己的伴生程序。
+当 Codeg 启动一个智能体时，它还会给智能体一组待连接的 **MCP 服务器**。其中之一通常是 Codeg 自己的伴生程序 —— 只要它的工具组至少有一个开着 —— 但不接受通过协议传入 MCP 服务器的智能体除外：内置智能体中的 **OpenClaw**、**Pi**，以及自 **0.36.0** 起的 **Cline**，还有关掉了 MCP 支持的自定义智能体。
 
 ## 多智能体委派与 `codeg-mcp` {#multi-agent-delegation-and-codeg-mcp}
 
-`codeg-mcp` 是一个智能体能够将工作**交给另一个智能体**的方式 —— 也是它触及 Codeg 自身其余工具的途径。当 Codeg 启动一个智能体 CLI 时，它注入一个指向该二进制文件的 MCP 服务器条目；CLI 通过 stdio 启动它，其 LLM 便获得一组 Codeg 工具 —— 最重要的是 **`delegate_to_agent`**，外加来自[协作设置](/zh/reference/settings/collaboration)的可切换工具组：`check_user_feedback`、`ask_user_question` 和 `get_session_info`，内置浏览器的 `browser_*` 工具，电脑操作的 `computer_*` 工具，以及那两个从对话中创建内容的写入工具。一次 `delegate_to_agent` 调用会经由伴生程序回传到父 Codeg 进程，后者启动工作智能体并将其结果流式传回；其他每一次调用也走同一条路，由 Codeg 自己来应答。
+`codeg-mcp` 是一个智能体能够将工作**交给另一个智能体**的方式 —— 也是它触及 Codeg 自身其余工具的途径。当 Codeg 启动一个智能体 CLI 时，它注入一个指向该二进制文件的 MCP 服务器条目；CLI 通过 stdio 启动它，其 LLM 便获得一组 Codeg 工具 —— 最重要的是 **`delegate_to_agent`**，外加来自[协作设置](/zh/reference/settings/collaboration)的可切换工具组：`check_user_feedback`、`ask_user_question` 和 `get_session_info`，内置浏览器的 `browser_*` 工具，电脑操作的 `computer_*` 工具，以及那两个从对话中创建内容的写入工具。一次 `delegate_to_agent` 调用会经由伴生程序回传到父 Codeg 进程，后者启动工作智能体并将其结果流式传回；其他每一次调用也走同一条路，由 Codeg 自己来应答。自 **0.36.0** 起，这次调用可以用 id 指名一个[助手](/zh/guide/assistants)，而不是一个智能体：伴生程序的工具描述里列出了会话开始时已启用的那些助手，Codeg 在调用到达时解析这个 id，用助手保存的选项启动它自己的智能体，并把它的常驻指令加进任务里。伴生程序如果发现自己在和一个较旧的 Codeg 通信，就会拒绝这次调用并要求重启，而不是把工作交给一个普通的智能体。
 
 智能体拿到哪些工具组，是在**它启动时**决定的 —— 伴生程序的工具列表在该会话内是固定的 —— 因此打开某个工具组，只会作用于之后启动的智能体。有几个工具组还会在每次调用时重新检查，因此把其中一个*关掉*，对正在运行的会话同样生效。
 
@@ -77,9 +77,9 @@ Codeg 并不重新实现 Claude Code、Codex、Gemini 等等 —— 它**驱动�
 
 ## 你的数据存放在哪里 {#where-your-data-lives}
 
-Codeg 将其状态保存在**本地机器**上。它的[数据目录](/zh/getting-started/configuration#where-codeg-stores-its-data) —— 即平台自己的数据目录，例如 macOS 上桌面应用的 `~/Library/Application Support/app.codeg`，或服务器上的 `CODEG_DATA_DIR` —— 存放 **SQLite 数据库**（对话、设置、账户元数据），以及**上传**和**[日志](/zh/reference/settings/logs)**目录。你的**[技能](/zh/guide/skills)**存放在 **`~/.codeg/`** 之下，它会随 `CODEG_HOME` 移动 —— 而一旦设置了 `CODEG_HOME`，上传和日志也会随它一起搬过去。机密是刻意的例外：在桌面端，令牌会进入**操作系统密钥环**，而非上述任何文件 —— 这一拆分在[版本控制](/zh/reference/settings/version-control)以及[备份与恢复](/zh/reference/settings/system)中都有描述。
+Codeg 将其状态保存在**本地机器**上。它的[数据目录](/zh/getting-started/configuration#where-codeg-stores-its-data) —— 即平台自己的数据目录，例如 macOS 上桌面应用的 `~/Library/Application Support/app.codeg`，或服务器上的 `CODEG_DATA_DIR` —— 存放 **SQLite 数据库**（对话、设置、账户元数据），以及**上传**和**[日志](/zh/reference/settings/logs)**目录。你的**[技能](/zh/guide/skills)**存放在 **`~/.codeg/`** 之下，它会随 `CODEG_HOME` 移动 —— 而一旦设置了 `CODEG_HOME`，上传和日志也会随它一起搬过去。机密是刻意的例外：在桌面端，令牌会进入**操作系统密钥环**，而非上述任何文件 —— 这一拆分在[版本控制](/zh/reference/settings/version-control)以及[数据与同步](/zh/reference/settings/system#backup-restore)中都有描述。Codeg 自己记录的智能体历史 —— 它为自定义智能体以及 ZCode、TRAE CLI 和 Command Code 写下的 `acp-transcripts` —— 也存放在数据目录中，除非设置了 `CODEG_HOME`，那样它会一起挪过去。
 
-中间没有 Codeg 云。桌面应用和你运行的服务器都将一切保留在它们运行所在的机器上；唯一离开的，只是智能体自身对你所配置的模型提供商的调用。[隐私与安全](/zh/reference/privacy)介绍了这在实践中意味着什么。
+中间没有 Codeg 云。桌面应用和你运行的服务器都将一切保留在它们运行所在的机器上；唯一离开的，只是智能体自身对你所配置的模型提供商的调用 —— 以及你自己打开的东西，比如 Claude Code 的远程控制，或者用于配置同步的 WebDAV 服务器。[隐私与安全](/zh/reference/privacy)介绍了这在实践中意味着什么。
 
 ## 值得了解 {#good-to-know}
 

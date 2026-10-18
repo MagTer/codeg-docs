@@ -82,5 +82,5 @@ a summary slide at the end.
 
 - [**技能**](/zh/guide/skills)——按智能体启用技能包是如何运作的，以及如何编写你自己的技能。
 - [**科学研究**](/zh/guide/research)——另一个精选的领域技能包，从假设到撰写。
-- [**工作区**](/zh/guide/workspace)——这些文档在其中打开的文件标签页和预览界面。
+- [**右侧面板**](/zh/guide/side-panel#work-with-files-—-editor-diffs-and-previews)——这些文档在其中打开的文件标签页和预览界面。
 - [**使用智能体**](/zh/guide/agents)——挑选并登录将执行撰写工作的智能体。

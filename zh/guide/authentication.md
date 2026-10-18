@@ -7,7 +7,7 @@ description: 用智能体自己的订阅、提供商 API 密钥或自定义端�
 
 Codeg 不附带自己的任何模型。每个智能体都带来自己的凭据——你已经在付费的订阅、一个提供商 API 密钥，或一个兼容的端点——并与它自己的模型通信。本页讲的是让一个智能体完成认证以便它能运行，以及在它能运行之后选择它使用哪个模型。
 
-你按智能体逐个进行，在**设置 → 智能体**中：打开一个智能体，它的详情面板会显示适用于它的登录选项。一个独立的**模型提供商**面板为支持它们的智能体保存可复用的凭据。启用一个智能体并确认它状态正常是第一步——参见[使用智能体](/zh/guide/agents)——而[支持的智能体](/zh/guide/supported-agents)是这一切所适用的名单。
+你按智能体逐个进行，在**设置 → 智能体**中：打开一个智能体，它的详情面板会显示适用于它的登录选项——[各智能体配置](/zh/guide/agent-setup)逐一介绍了每个面板。一个独立的**模型提供商**面板为支持它们的智能体保存可复用的凭据。启用一个智能体并确认它状态正常是第一步——参见[使用智能体](/zh/guide/agents)——而[支持的智能体](/zh/guide/supported-agents)是这一切所适用的名单。
 
 ## 智能体如何认证 {#how-agents-authenticate}
 
@@ -19,37 +19,34 @@ Codeg 不附带自己的任何模型。每个智能体都带来自己的凭据�
 
 这些是互斥的：一个智能体一次只使用一种，切换认证模式会在它们之间切换。接下来的三节将逐一讲解。
 
+最新的四个智能体完全没有认证模式下拉菜单。**Kiro CLI**、**TRAE CLI** 和 **Command Code** 用它们自己的登录命令登录，在终端里运行一次即可——TRAE CLI 和 Command Code 的面板会给出这条命令，并带一个复制按钮——并为打不开浏览器的机器提供一个可选的密钥或令牌；**ZCode** 则完全在官方 ZCode 应用里登录。见下文。
+
 ## 用订阅登录 {#sign-in-with-a-subscription}
 
 最简单的路径是使用智能体自己的订阅——也就是你在它的 CLI 中会使用的套餐。对大多数智能体而言，这意味着在终端里**通过智能体自己的工具登录一次**；随后 Codeg 会复用那次登录，不会额外存储任何东西：
 
-- **Claude Code**——选择**官方订阅**，Codeg 就会使用你现有的 `claude` 登录。无需密钥。
-- **Gemini**——选择 **Google 登录**，并先在终端中运行 `gemini` 来完成 Google 的登录。
-- **Kimi Code**、**CodeBuddy**——在终端中运行智能体自己的登录命令（`kimi login`、`codebuddy`），Codeg 会自动识别它。Kimi Code 走 API 密钥这条路时另有一个自己的面板。→ [Kimi Code](#kimi-code-provider-model-and-reasoning)
+- **Claude Code**——选择**官网订阅**，Codeg 就会使用你现有的 `claude` 登录。无需密钥。
+- **Gemini**——选择 **Google 登录（OAuth）**，并先在终端中运行 `gemini` 来完成 Google 的登录。
+- **Kimi Code**、**CodeBuddy**——在终端中运行智能体自己的登录命令（`kimi login`、`codebuddy`），Codeg 会自动识别它。Kimi Code 走 API 密钥这条路时另有一个自己的面板。→ [Kimi Code](/zh/guide/agent-setup#kimi-code-provider-model-and-reasoning)
+- **Kiro CLI**、**TRAE CLI**、**Command Code**——在终端里运行一次智能体自己的登录命令：`kiro-cli login`、`traecli login`（用你的企业 SSO）或 `command-code login`；TRAE CLI 和 Command Code 的面板会给出这条命令，并带一个复制按钮。在服务器或容器上，它们各自改用一份凭据：Kiro 的 **API Key**（`KIRO_API_KEY`）、TRAE CLI 的**个人访问令牌**（Codeg 会在每次启动会话时用它登录），以及 Command Code 的 **API 密钥**（`COMMAND_CODE_API_KEY`，它优先于那次登录）。→ [各智能体配置](/zh/guide/agent-setup#kiro-cli)
+- **ZCode**——在官方 ZCode 里登录即可；Codeg 运行的桥接器会复用那次登录，Codeg 不复制任何东西。ZCode 的 **Start Plan** 账户无法通过桥接器运行，因为它的请求需要验证码，而只有 ZCode 桌面应用能完成；GLM Coding Plan 账户可以正常使用。→ [ZCode](/zh/guide/agent-setup#zcode)
 - **Grok** 和 **Cursor** 各自拥有一个**认证方式**选择器：
   - **Grok**——**官网订阅**（通过 `grok login` 使用 SuperGrok 或 X Premium+；不存储任何东西）、**XAI API 密钥**（来自 xAI 控制台的密钥，用于无人值守运行），或**自定义接口**（一个带有自己的基础 URL 和密钥的自定义模型，它会成为 Grok 的默认模型）。
-  - **Cursor**——**官方订阅**，此时 Codeg 会向你展示需要运行的 `cursor-agent login` 命令（会打开一个浏览器窗口），你刷新后它会显示**已登录**；或者使用来自 Cursor 控制台的 **Cursor API 密钥**，用于无人值守和服务器机器。请注意该密钥是一个 *Cursor 账户*密钥——`cursor-agent` 只与 Cursor 自己的后端通信，因此它并非通往第三方端点的途径。Codeg 会把两者都写入与该 CLI 共享的 `~/.cursor/cli-config.json`。
-
-
-::: warning Cursor：那盏不作数的绿灯
-`cursor-agent status` 只凭**有没有** token 就报告自己已登录，从不读它的有效期——而协议侧对一个五分钟内就要过期的 token 会拒绝开新会话，CLI 又没有刷新凭据的授权方式。于是一份过期的登录会一直显示**已登录**，而每一条提示都失败。
-
-自 **0.31.2** 起，Codeg 会拿凭据去 Cursor 那边实际校验一次，并如实汇报：存着的登录用不了时显示**已登录——凭据未通过校验**（通常是会话过期，重新登录即可；CLI 自己没法刷新浏览器登录），如果用的是密钥方式，同一个状态会指出这是一把**被拒绝的 API 密钥**（已吊销、已过期或敲错了）。Codeg 给出的那条登录命令在**服务器**上同样能用——那里没有浏览器可开，所以它前面带了 `NO_OPEN_BROWSER=1`，让 `cursor-agent` 改为打印一个 URL 给你在自己机器上打开；唯一的例外是 Windows 主机，那个 POSIX 前缀在那儿跑不了。无人值守的服务器，请改用 API 密钥方式。
-:::
+  - **Cursor**——**官网订阅**，此时 Codeg 会向你展示需要运行的 `cursor-agent login` 命令（会打开一个浏览器窗口），你刷新后它会显示**已登录**；或者使用来自 Cursor 控制台的 **Cursor API 密钥**，用于无人值守和服务器机器。请注意该密钥是一个 *Cursor 账户*密钥——`cursor-agent` 只与 Cursor 自己的后端通信，因此它并非通往第三方端点的途径。Codeg 会把两者都写入与该 CLI 共享的 `~/.cursor/cli-config.json`。自 **0.31.2** 起，Codeg 还会检查存着的登录是否仍然可用，而不是轻信 CLI 的一面之词。→ [Cursor](/zh/guide/agent-setup#cursor)
 
 集成终端（**⌘J**）就在手边，供你完成这些一次性登录。
 
-**Codex 是例外**——它在 Codeg *内部*登录。选择**官方订阅**并点击**使用 ChatGPT 登录**：Codeg 会显示一个代码和一个验证链接，你在浏览器中批准它，面板便会以绿色的**账户已登录**予以确认。随时再次点击即可重新登录或切换账户。
+**Codex 是例外**——它在 Codeg *内部*登录。选择**官网订阅**并点击**使用 ChatGPT 登录**：Codeg 会显示一个代码和一个验证链接，你在浏览器中批准它，面板便会以绿色的**账户已登录**予以确认。随时再次点击即可重新登录或切换账户。
 
 ## 用 API 密钥或自定义端点连接 {#connect-with-an-api-key-or-custom-endpoint}
 
-更愿意按 API 调用付费，或通过一个 OpenAI/Anthropic/Gemini 兼容的网关来路由？在智能体的认证模式中选择**自定义端点**并填写：
+更愿意按 API 调用付费，或通过一个 OpenAI/Anthropic/Gemini 兼容的网关来路由？在智能体的认证模式中选择**自定义接口**并填写：
 
 - **API URL**——你的提供商或网关的基础 URL。
 - **API Key**——你的密钥，带有一个显示/隐藏切换。
 - **Model**——要请求的模型 id（在智能体需要时填写）。
 
-Codeg 会在智能体启动时把这些交给它。大多数智能体都接受这条路径；实际显示的字段取决于该智能体所能理解的内容。
+Codeg 会在智能体启动时把这些交给它。大多数智能体都接受这条路径，实际显示的字段取决于该智能体所能理解的内容。Kiro CLI、ZCode、TRAE CLI 和 Command Code 不提供这条路径：它们各自只与自己的服务通信（TRAE CLI 的面板可以改为把它指向你所在组织自己部署的 TRAE）。
 
 ## 保存并复用模型提供商 {#save-and-reuse-a-model-provider}
 
@@ -62,78 +59,35 @@ Codeg 会在智能体启动时把这些交给它。大多数智能体都接受�
 一旦绑定，智能体的 API 字段会显示为只读，由该提供商填充——而对 Claude Code 来说，提供商对每一个模型槽位都说了算：它填了的槽位会设到智能体上，它留空的槽位会被清空，因此早先配置留下的东西不会残留在底下。在 Claude Code 上，把认证模式从**模型供应商**切走再切回来，会保留你之前选中的那个提供商——在 **0.32.3** 之前，它会改绑到你最早创建的那个提供商，并把它的模型保存下来。之后编辑某个提供商时，Codeg 会标记出任何需要**重新连接**才能采用该更改的运行中会话。
 
 ::: tip 自定义端点与模型提供商的区别
-它们配置的是同一样东西——一个基础 URL、一个密钥和一个模型——但作用范围不同。**自定义端点**是在单个智能体上内联输入的；而**模型提供商**是一条你设置一次并复用的具名记录。如果你只为一个智能体使用一个端点，自定义端点更简单；如果你要同时应付好几个，就把它们保存为提供商。（提供商一经创建，它的智能体类型就固定了。）
+它们配置的是同一样东西——一个基础 URL、一个密钥和一个模型——但作用范围不同。**自定义接口**是在单个智能体上内联输入的；而**模型提供商**是一条你设置一次并复用的具名记录。如果你只为一个智能体使用一个端点，自定义端点更简单；如果你要同时应付好几个，就把它们保存为提供商。（提供商一经创建，它的智能体类型就固定了。）
 :::
 
 ## 选择一个模型 {#choose-a-model}
 
-你能选哪些模型，取决于**智能体**，而非 Codeg。一旦某个智能体连接上，composer 的**模型下拉菜单**会准确列出该智能体针对你的登录方式所提供的模型——因此选择会因智能体而异。在那里选一个，它就会对该对话生效。
+你能选哪些模型，取决于**智能体**，而非 Codeg。一旦某个智能体连接上，composer 的[智能体设置按钮](/zh/guide/conversations#start-a-session-—-the-composer)里的模型列表会准确列出该智能体针对你的登录方式所提供的模型——因此选择会因智能体而异。列表较长时会带一个搜索框，智能体推荐的模型也会被标出来。在那里选一个，它就会对该对话生效。
 
 - **Codeg 会为每个智能体记住你上次的选择**，并在你下次用该智能体开启会话时预选它。
 - **没有按文件夹设置的模型默认值**——模型是在会话层面选择的。（文件夹默认值设定的是*智能体*，而非模型。）
 - **重新打开的 Claude Code 历史，会在模型具备 1M 窗口时按 1M 计算。** 自 **0.35.0** 起，对于原生具备 1M 窗口的模型——Opus 4.7 及之后、Sonnet 5 及之后、Haiku 5.5、Fable 和 Mythos——你重新打开的 Claude Code 对话，其上下文圆环会以 **1M** 而不是 200K 为基准来计算。窗口大小并不会被存下来，所以旧对话会在下一次被读取时用上它。同一个版本还把 **Claude Haiku 5.5** 设为推荐的 Haiku 模型，在 Claude Code 的面板上和模型供应商的对话框里都是如此。
 - **保存在 *(1M context)* 条目上的 Claude Code 对话依然能用。** 自 Claude Code **2.1.285** 起，通过自定义 API 地址接入的网关只会列出普通模型——它们默认就使用 1M 窗口——而有些账户更早就已经没有单独的 *Opus (1M context)* 条目了。设在这类条目上的对话会改用与它对应的普通模型继续，而不是退回默认模型。如果你的网关上限是 200K，Claude Code 自己的建议是 `/autocompact 200k`。
 - **保存下来的 Fable 选择在 Claude Code 2.1.287 下依然有效。** 这个版本随适配器 **0.86.0** 自 Codeg **0.34.0** 起内置，它把 Fable 条目从 `claude-fable-5-1` 改成了 `fable`，于是 Codeg 保存的 Fable 选择对不上任何条目，每次连接都会退回默认模型。现在 Codeg 会把这个选择转到唯一一个指向同一模型的条目上——按它的名称 *Fable 5.1*、按它描述的开头，或者按 **Fable 默认模型**槽位（模型供应商里叫**默认 Fable 模型**）钉住的 id 来认——前提是还有条目指向这个版本；*(1M context)* 的 Fable 选择也按同样方式转过去。如果没有条目指向它，或者有不止一个，就什么都不转，会话使用 Claude Code 的默认模型。保存下来的选择本身不会被改写——重新选一次 Fable，就会存下新的 id。
-- **模型一律按其所属智能体的叫法显示。**自 **0.31.0** 起，Codeg 会记录智能体模型选择器公布的 id/名称对应关系，因此回复页脚、会话详情和侧边栏悬浮胶囊显示的是 `Qwen3.8-Flash`，而不是会话记录里那个形如 `qfmodel` 的账号内部 id。
+- **模型一律按其所属智能体的叫法显示。** 自 **0.31.0** 起，Codeg 会记录智能体模型选择器公布的 id/名称对应关系，因此回复页脚、会话详情和侧边栏悬浮胶囊显示的是 `Qwen3.8-Flash`，而不是会话记录里那个形如 `qfmodel` 的账号内部 id。
 
 **推理强度**在 composer 里按会话设置——只有少数几个智能体的面板补上了 composer 表达不了的东西：
 
 - **Grok** 保留着设置面板里的下拉，从低一直到 **Max**，写进 Grok 自己的配置。
 - **Claude Code** 和 **Codex** 曾经也有，直到 **0.30.0** 把两个都删掉了。它们读起来像是决定一轮「想多深」的旋钮，而真正说了算的是 composer 里按会话的选择器，于是两者可能各说各话，屏幕上还没有任何东西说明谁赢了。已经写进配置文件的 `effortLevel` 会被**原样留着**，而不是顺手清理掉。
-- **Pi** 的做法更像 Kimi Code 而不是 Grok：因为 pi 只会为*声明*了自己会思考的模型发送强度，它的面板正是你做这个声明的地方 —— 一个开关、你的模型接受 pi 七个档位中的哪些，以及每一档实际发出去的值。自 **0.32.3** 起，这些档位一直到**最高**，面板还会说明 pi 实际会以哪一档运行所选模型。→ [Pi：自定义供应商上的思考强度](/zh/guide/agents#pi-reasoning-on-a-custom-provider) · [每个模型能思考到哪一档](/zh/guide/agents#pi-thinking-levels-and-version)
-- **Kimi Code** 则反过来：它的面板负责声明有哪些级别*存在*，再由 composer 的思考选择器把它们呈现出来。→ [Kimi Code](#kimi-code-provider-model-and-reasoning)
-- **Cursor** 把强度折进了它的模型选择器——见 [Cursor：族系加旋钮](/zh/guide/agents#cursor-families-and-knobs-not-two-hundred-ids)。
-
-## Hermes：选择一个提供商 {#hermes-pick-a-provider}
-
-Hermes 是一个特例——它管理着自己旗下的一批模型提供商，因此它没有单个密钥，而是有自己的配置面板，带一个**提供商**下拉菜单，按三种方式分组：
-
-- **API 密钥**提供商——输入你的密钥（如果该提供商需要，还有一个基础 URL）以及一个模型名称。密钥会保存到 Hermes 自己的 `~/.hermes/.env` 中。
-- **OAuth** 提供商（Nous、OpenAI Codex、Gemini、GitHub Copilot 等）——无需输入密钥；点击 **Run Hermes setup**，Hermes 会在终端中为你完成认证。
-- **AWS**（Bedrock）——使用你环境中现有的 AWS 凭据。
-
-对于面板未涵盖的任何内容，**打开配置文件夹**会显示 `~/.hermes`，而一个高级部分让你直接编辑 Hermes 的 `config.yaml`。
-
-## Kimi Code：提供商、模型与推理 {#kimi-code-provider-model-and-reasoning}
-
-Kimi Code 是另一个拥有专属面板的智能体，该面板在 **0.23** 中被重做过。原因在于这个 CLI 的一个怪癖：`kimi acp` 只接受**已存储的登录令牌**，从不接受在启动时递给它的密钥。所以 API 密钥没法简单地透传过去——Codeg 会往 `~/.kimi-code/config.toml` 里写入一个**受管提供商**，并埋下一个本地的门禁令牌，好让会话能够开启。推理依然跑在你自己的密钥上；那个令牌只负责开门。
-
-**凭据**——两条互斥的路径：
-
-- **API 密钥**——从 Kimi 接受的六种提供商形态中选一个（**Kimi / Moonshot**、**OpenAI**（Chat Completions 或 Responses 两种形态）、**Anthropic**、**Google Gemini**，或使用你的 GCP 凭据、完全不需要密钥的 **Google Vertex AI**），再在需要时填一个基础 URL。Moonshot 的两个区域——`api.moonshot.ai` 与 `api.moonshot.cn`——只有一次点击之隔。
-- **用 Kimi 账号登录**——在终端里运行 `kimi login`，Codeg 会复用那次登录，自己什么都不存。用这种方式保存会移除 Codeg 的 API 密钥门禁令牌。
-
-**模型**——写入 `config.toml` 的模型 id，外加**最大上下文长度**。第二个字段看起来可选，其实不是：Kimi 的 schema 要求它，缺了它 Kimi 会丢弃整个模型配置块，于是每一次提问的回复都是空的。它默认为 **262144**。**测试并列出模型**会用你的密钥发起调用并报告它实际能访问到什么，于是一个拼写错误会当场显示为*该模型不在列表中*，而不是在对话进行到一半时变成*模型未找到*。
-
-**推理**——只有当模型声明了推理能力时，Kimi 才会在 composer 中提供**思考**选择器，所以这一节负责替它声明一个。**提供的级别**会成为该选择器的选项，并被原样转发给提供商，因此请挑选你的模型接受的那些；一个都不选，composer 就退回到一个朴素的关 / 开切换。你可以设定一个**默认级别**（或者交给 Kimi 自己决定）；对于总是会推理的模型，还可以把*关*这一项整个去掉。更改在新会话中生效。
-
-**高级**中有**凭据写入位置**——内联的 `api_key` 还是提供商的 env 子表——以及一个 `config.toml` 的原始编辑器，它会原样覆盖整个文件，替换掉上面那些结构化字段所设置的一切。
-
-**历史读起来和实时时一样。** 自 **0.35.2** 起，在 Kimi Code **2.2.0** 上，重新打开的对话会按你发送时的样子显示你的提示词：附件显示为徽章和缩略图，而不是原始的 `<resource>` 文本；你调用的技能或命令显示为 `/name args`；在 Kimi 自行发起的回合里，也不会再有一段内部提示词顶替你的消息。标题会略去附件文本，用文件名指代被提及的文件，最长 100 个字符，也不会再在两个版本之间来回切换。
-
-::: warning 残留的环境变量会压过配置
-`kimi acp` 读取 `KIMI_MODEL_*` 这一族变量——`KIMI_MODEL_BASE_URL`、`KIMI_MODEL_API_KEY`、`KIMI_MODEL_NAME`——而且是*先于* `config.toml` 读取的，因此智能体[环境变量](/zh/guide/agents#configure-an-agent)中残留的一个，就会悄悄覆盖掉这个面板写入的一切。只要还有任何一个存在，面板就会提醒你，而保存操作会清除它们——于是你看到的就是真正生效的。
-:::
-
-## DeepSeek Harness：端点与密钥 {#deepseek-harness-endpoint-and-key}
-
-**DeepSeek Harness** 的面板是最短的那一个，因为适配器把它的两项设置都当作普通的环境变量来读：
-
-- **API 端点**——留空即使用 DeepSeek 自己的 `https://api.deepseek.com`。要走代理或兼容端点时再填；它要求一个完整的 `http(s)` URL，且不带查询串。
-- **API 密钥**——以 `DEEPSEEK_API_KEY` 传给智能体。
-
-模型和思考强度**不在**这里。适配器把两者都作为普通的会话选项通告出来，因此它们位于 [composer](/zh/guide/workspace#start-a-session-—-the-composer) 中，归属于一段对话而不是这个智能体。启动时的默认模型是该智能体原始[环境变量](/zh/guide/agents#configure-an-agent)里的 `DEEPSEEK_ACP_MODEL`——刻意不放进这个面板，这样这里的一次保存就永远不会覆盖掉你正在那边编辑的那一行模型配置。
-
-::: tip 环境变量的优先级高于凭据文件
-DeepSeek Harness 也可以在终端里登录，那会把密钥存进 `~/.dsh/.credentials.yaml`。环境变量优先——所以如果你是那样登录的，就**让 API 密钥这一栏留空**，而不是填上同一个值、再让自己有两处需要同步维护。
-:::
+- **Pi** 的做法更像 Kimi Code 而不是 Grok：因为 pi 只会为*声明*了自己会思考的模型发送强度，它的面板正是你做这个声明的地方 —— 一个开关、你的模型接受 pi 七个档位中的哪些，以及每一档实际发出去的值。自 **0.32.3** 起，这些档位一直到**最高**，面板还会说明 pi 实际会以哪一档运行所选模型。→ [Pi：自定义供应商上的思考强度](/zh/guide/agent-setup#pi-reasoning-on-a-custom-provider) · [每个模型能思考到哪一档](/zh/guide/agent-setup#pi-thinking-levels-and-version)
+- **Kimi Code** 则反过来：它的面板负责声明有哪些级别*存在*，再由 composer 的思考选择器把它们呈现出来。→ [Kimi Code](/zh/guide/agent-setup#kimi-code-provider-model-and-reasoning)
+- **Cursor** 把强度当作它的模型的一个旋钮——在它的设置页上，它附在会话起步时所用的模型上；会话跑起来之后，它又成了一项独立的设置。→ [Cursor：族系加旋钮](/zh/guide/agent-setup#cursor-families-and-knobs-not-two-hundred-ids)
+- **Kiro CLI** 只为支持它们的模型提供 **Thinking** 和 **Reasoning effort**，这两项设置由 Codeg 根据 Kiro 报告的内容拼出来。→ [Kiro CLI](/zh/guide/agent-setup#kiro-cli)
 
 ## 凭据存储在何处 {#where-credentials-are-stored}
 
 Codeg 把智能体凭据保存在智能体自己保存的地方——不会有任何内容上传到 Codeg：
 
-- **智能体自己的原生配置。** 由智能体的 CLI 处理的订阅登录或密钥会留在该智能体的文件中——`~/.codex/auth.json`、`~/.hermes/.env`、`~/.grok/auth.json` 等等——正是智能体自己的工具存放它的地方。
-- **Codeg 的本地数据库。** 你输入到 Codeg UI 中的密钥——自定义端点密钥和已保存的模型提供商——由 Codeg 存储在本地，并在智能体启动时作为环境变量注入。与智能体自己的配置文件一样，它们在静态时并未加密，而遮蔽显示只是表面功夫——因此请把对你机器的访问权限视为安全边界。
+- **智能体自己的原生配置。** 由智能体的 CLI 处理的订阅登录或密钥会留在该智能体的文件中——`~/.codex/auth.json`、`~/.hermes/.env`、`~/.grok/auth.json`、Kiro 的 `~/.kiro`、TRAE CLI 的 `~/.trae`、Command Code 的 `~/.commandcode/auth.json` 等等——正是智能体自己的工具存放它的地方。ZCode 的登录状态则留在 ZCode 应用内部。
+- **Codeg 的本地数据库。** 你输入到 Codeg UI 中的密钥——自定义端点密钥、已保存的模型提供商，以及 Kiro CLI、TRAE CLI 或 Command Code 面板上的密钥或令牌——由 Codeg 存储在本地，并在智能体启动时作为环境变量注入。与智能体自己的配置文件一样，它们在静态时并未加密，而遮蔽显示只是表面功夫——因此请把对你机器的访问权限视为安全边界。
 
 这与 **git 账户**令牌是分开的，后者*确实*保存在你的系统密钥环中。→ [git 账户](/zh/guide/git#git-accounts)
 

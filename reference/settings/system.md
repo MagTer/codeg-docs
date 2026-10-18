@@ -1,11 +1,11 @@
 ---
 title: System
-description: The System settings screen — Codeg's operations hub for software updates, launching at login, the network proxy, the app language, and full backup and restore.
+description: The System settings screen — Codeg's operations hub for software updates, launching at login, the network proxy, the app language, configuration sync between machines, and full backup and restore.
 ---
 
 # System
 
-**Settings → System** — labeled **System Management** in the app — is the operations screen: *"Manage app updates, launch at login, network proxy and language preferences,"* plus a fifth panel for backing up and restoring everything. Five independent sections, each saving on its own; nothing here needs a page-level Save.
+**Settings → System** — labeled **System Management** in the app — is the operations screen: *"Manage app updates, launch at login, network proxy and language preferences,"* plus a fifth for syncing your settings between machines and for backing up and restoring everything. Five independent sections, each saving on its own; nothing here needs a page-level Save.
 
 ## Software Update
 
@@ -19,9 +19,11 @@ A new release also announces itself in the workspace: a **New v…** badge appea
 
 What the upgrade button does depends on where you're running — this is the one screen where desktop and server genuinely differ:
 
-- **Desktop app** — **Upgrade to vX** downloads the release, shows a progress bar, and when it's staged flips to **Restart to update**; clicking that relaunches into the new version. This is Codeg's built-in auto-updater.
+- **Desktop app** — **Upgrade to vX** downloads the release and shows a progress bar. On macOS and Linux it then flips to **Restart to update**, which relaunches into the new version. On **Windows** there's no restart step: once the download is done Codeg closes and the installer runs without prompts and reopens it. Since **0.36.0** Codeg first stops its agents with their `codeg-mcp` companions, its terminals and the Web Service, and remembers your open windows; the installer moves aside a file that's still in use, which used to stop an update with *Error opening file for writing* on `codeg-mcp.exe`; and if the installer can't start, Codeg comes back on the version you had.
 - **A self-updating server** — a standalone `codeg-server` (or Docker) that supports in-place updates behaves the same way: download, progress, restart. See [Deployment](/getting-started/deployment) for how server updates work.
 - **Anything that can't self-update** — an older remote server falls back to a **View vX release** button that opens the GitHub releases page, so you can update it by hand.
+
+**A package must be signed for the version on offer.** Since **0.36.0**, in the desktop app and the server's online upgrade alike, Codeg installs an update only if its signature names the very version the release announced — so an older signed package can't be passed off as a newer one. A package that fails this check shows as a plain *Failed to install update*.
 
 ::: info Rollback (server only)
 A self-updating server keeps the previous binary, so after an upgrade a **Roll back** button appears — *"Restore the version installed before the last upgrade."* It's there for a regression that only surfaces later, once the automatic trial-window check has already passed. The desktop app updates through the OS installer and doesn't offer this. On **Docker**, an in-place upgrade is only live until the container is recreated — *"to keep it, pull or build an image at the new version and recreate."*
@@ -29,13 +31,15 @@ A self-updating server keeps the previous binary, so after an upgrade a **Roll b
 
 **A server that can't write to its own installation says so before you try.** Since **0.32.1** a self-updating `codeg-server` — on Linux or macOS — checks ahead of time that it can write both where its binary lives and where its web files live. When it can't, the panel says which directory, and why if the system gave a reason such as a full disk, in amber; the upgrade button becomes **View vX release** for a manual update, and the status bar's update popover says the same while a release is on offer. It used to get as far as installing and fail with a bare *close the app and try again*. **Roll back** stays available unless the problem is a missing permission.
 
-If a check or install fails, the reason is shown inline — an unreachable update source, a network error, or a failed download or install — usually a connectivity issue, which the proxy panel below can address.
+If a check or install fails, the reason is shown inline — an unreachable update source, a network error, or a failed download or install — usually a connectivity issue, which the proxy panel below can address. A package refused by the version check above lands here too, as a failed install.
 
 ## Launch at login
 
 One switch, added in **0.27**: *"Opens automatically after you sign in to this computer."* Desktop only, and it works on **macOS, Windows, and Linux** alike. On macOS it registers a Launch Agent, which is why turning it on doesn't trigger an Automation consent prompt.
 
 Codeg keeps **no copy of this setting** — the operating system's own startup entry is the only record, and the switch reads back from it. That matters in one specific way: what the toggle shows afterwards is **what the system actually settled on**, not what you asked for. If something outside Codeg vetoes the entry — Windows Task Manager's startup tab is the usual culprit — the switch flips back to off rather than claiming a state the machine disagrees with. If the entry can't be read at all, the panel says so instead of guessing.
+
+On **macOS**, a Codeg that opened at login may not come back by itself after an update that was started from **0.35.2 or earlier** — click its Dock icon to open it. Updates started from 0.36.0 on relaunch normally.
 
 ## Network Proxy
 
@@ -48,7 +52,7 @@ The address takes an `http`, `https`, or `socks5` URL — the placeholder is `ht
 **Bypass proxy for** lists what should connect directly instead — new in **0.32.2**. Separate entries with commas and no spaces: `example.com` matches that domain, `.example.com` every subdomain of it, and IP addresses work too. The local addresses — `localhost`, `127.0.0.1`, `::1` — always connect directly and needn't be listed. The field saves when you leave it, and while the proxy is on the list takes effect as the `NO_PROXY` environment variable, for Codeg and for every agent it launches. A `*` anywhere in it means *bypass everything*, and Codeg then passes `*` on by itself, because Python and curl honour `*` only as the whole value.
 
 ::: warning `*` doesn't fully bypass Antigravity 1.3.0 and later
-**Antigravity 1.3.0**, pinned from **0.34.0**, and **1.4.0**, pinned since **0.35.2**, add the local addresses to `NO_PROXY` themselves whenever a proxy is set. That turns a lone `*` into `*,localhost,127.0.0.1,::1` — a list, in which Python skips the `*`. So with a proxy configured and a `*` in this list, or in a `NO_PROXY` you export yourself, some of Antigravity's own requests — the ones its Python service makes — go **through the proxy** again. To keep them direct, list the hosts they need instead of `*`.
+**Antigravity 1.3.0** and later — **1.4.1** is pinned since **0.37.0** — add the local addresses to `NO_PROXY` themselves whenever a proxy is set. That turns a lone `*` into `*,localhost,127.0.0.1,::1` — a list, in which Python skips the `*`. So with a proxy configured and a `*` in this list, or in a `NO_PROXY` you export yourself, some of Antigravity's own requests — the ones its Python service makes — go **through the proxy** again. To keep them direct, list the hosts they need instead of `*`.
 :::
 
 That local exception also applies to a proxy you set from **outside** Codeg, and it's what lets **OpenCode** and **Antigravity** work behind a proxy on another machine: both talk to a local service of their own, and until **0.32.2** those connections were sent to the proxy too, failing with *OpenCode service failure* or *Failed to connect to WebSocket*.
@@ -61,11 +65,45 @@ Sets the language of Codeg's **own interface** — menus, buttons, settings. **A
 
 (This is the desktop or browser app's UI language — separate from the language of any one conversation, or of this documentation site.)
 
-## Backup & Restore
+## Data & sync {#backup-restore}
 
-A portable snapshot of your Codeg install — *"Export a portable backup of your codeg data, or restore from one."* Two tabs: **Backup** and **Restore**.
+The fifth card — *"Configuration sync carries your settings between machines; backup packs up all of this machine's codeg data."* Three tabs, opening on the first: **Configuration sync**, **Backup** and **Restore**.
+
+### Configuration sync {#configuration-sync}
+
+Your settings, carried between machines — through a file, or through your own WebDAV server. Unlike a backup it's small, it never deletes anything — it adds entries and updates the ones it matches, leaving alone whatever it doesn't mention — and it never touches your conversations. **What gets synced**, folded at the top, lists both halves:
+
+| Included | Not included |
+| -------- | ------------ |
+| Model providers, **with their API keys** | Conversations and history |
+| Agent settings — each agent's environment variables among them | Uploaded files and images |
+| Custom agents | Workspace projects and paths |
+| [Assistants](/guide/assistants), since **0.36.0** | MCP servers, which each CLI owns |
+| Quick messages and task templates | Login credentials and tokens |
+| App preferences — language, light or dark, zoom, close-button behaviour, log level, the delegation settings and agent defaults, most in-conversation tool switches, chat-channel defaults | |
+
+What *doesn't* travel among the preferences is as deliberate: the theme colour, fonts, chat width and the rest of Appearance live in each browser or window, the [browser-use and computer-use switches](/reference/settings/collaboration#in-conversation-tools) stay with the machine they act on, and nothing tied to an account or to this machine — git and forge tokens, chat-channel credentials, the Web Service token, the proxy, the Repository panel's settings and webhook secrets — ever leaves.
+
+**Configuration file.** **Export to file** writes one JSON file — `codeg-config-<time>.codegcfg.json` — to carry to another machine; **Import from file** shows what's in one, entry counts per kind, and asks before applying it. The file is **never encrypted**, whatever the WebDAV switch below says, and it holds your API keys — treat it like a password.
+
+**WebDAV sync**, off by default, uploads the same snapshot to a server you choose:
+
+- **Server** fills in an address for **Jianguoyun**, **Nextcloud** or a **Synology NAS**, or leave it on **Custom**. Then **Server URL**, **Username** and **Password** — an app password, where the service has them — and **Remote folder** (`codeg`) and **Profile** (`default`). Machines that share a profile share one configuration; give work and personal machines different ones. The files land in `<server>/<folder>/v1/<profile>/`.
+- **Encrypt the snapshot**, off by default, protects the upload with a **passphrase** that every machine you sync needs to share. Without it, an amber note says what's true: the snapshot goes up unencrypted, API keys included, so use a server only you can reach.
+- **Upload automatically**, on by default, checks every **5**, 15, 30 or 60 minutes — 5 unless you change it — and uploads only when the configuration has changed.
+- **Save** stores the settings. **Test connection** tries what's in the form without saving it. **Sync now** uploads straight away, and **Restore from remote** downloads and applies — both using the *saved* settings, so save your edits first. Below them, **Last synced** and any **Last error**.
+
+Nothing is ever **downloaded on its own**: automatic sync only uploads, and taking a copy from the server is always **Restore from remote**, after a confirmation that names the machine and the time it came from. Machines on one profile overwrite one copy, so the last to upload wins.
+
+**Applying** a file or a remote copy **adds and updates, and never deletes** — an entry the snapshot doesn't mention is left as it is. An incoming assistant whose name another one here already has is renamed *Name (2)*. Appearance, language and the provider list take effect after restarting Codeg. A snapshot in a format newer than this Codeg reads is refused before anything is written — a newer Codeg writing the same format is fine — and one from an older Codeg simply leaves alone what it doesn't carry.
+
+**Undo an import** appears once there's something to undo. Before every import, every restore from remote and every undo, Codeg tries to save the configuration as it was — the last ten, in `config-snapshots/` under `~/.codeg` (or `CODEG_HOME`), as plain JSON with the keys in it — and **Undo** puts one back. If that save fails, the import still goes ahead, without anything to undo it with. It re-applies that copy the same merging way, so values return to what they were, but an entry the import *added* stays.
+
+The WebDAV password and the passphrase are never part of a snapshot: they're kept in the OS keychain on the desktop, and in the server's own secret store on `codeg-server`. Change the server address or the username and save with the password field empty, and the stored password is dropped rather than sent to the new host. In a desktop window attached to a remote workspace, this tab works on the **server's** configuration.
 
 ### Backup
+
+A portable snapshot of this machine's whole Codeg install — *"Packs this machine's codeg data — the database and uploaded files — into one archive."* Where configuration sync carries settings and merges them, a backup carries everything and a restore replaces it.
 
 Export writes a single `.codegbak` archive of your **database and uploads**. Two choices shape it:
 
@@ -97,15 +135,15 @@ A snapshot carrying the manifest that records what was *absent* before the resto
 A restore also reports what it did instead of leaving you to guess: **Restore staged**, with counts for files kept because you didn't opt into overwriting — a merged session index isn't one of them — session databases that couldn't be written back, and — when agents were running and their transcripts went to a side folder instead of their original locations — which agents and which path.
 
 ::: warning Backup acts on this machine
-Backup and restore operate on the data of the machine actually running Codeg. If you're in a desktop app **connected to a remote workspace**, the panel is disabled with a note to *"manage its backups from that server directly"* — the native file dialogs here wouldn't line up with the remote server's storage.
+Backup and restore operate on the data of the machine actually running Codeg. If you're in a desktop app **connected to a remote workspace**, the **Backup** and **Restore** tabs are disabled with a note to *"manage its backups from that server directly"* — the native file dialogs here wouldn't line up with the remote server's storage. **Configuration sync** still works there, on the server's configuration.
 :::
 
 ## Good to know
 
-- **Five panels, five independent saves.** The proxy, the language, launch at login, and the update check each act on their own; there's no page-level Save, and changing one never touches another.
+- **Five panels, saved independently.** The proxy, the language, launch at login, the update check and Data & sync each act on their own — the WebDAV settings with a **Save** of their own; there's no page-level Save, and changing one never touches another.
 - **Launch at login has no stored copy.** The OS entry is the setting, so the switch shows what your machine actually agreed to.
 - **Desktop and server update differently.** The desktop app auto-installs and relaunches; a server updates in place with a restart (and can roll back); an old remote server just links you to the release. Same panel, three behaviors.
-- **An unencrypted backup is plaintext secrets.** API keys and tokens ride along in the clear unless you set a passphrase — encrypt it, or keep the file somewhere trusted. How Codeg handles secrets generally is under [Privacy & Security](/reference/privacy).
+- **An unencrypted backup is plaintext secrets** — and so is every configuration export. API keys and tokens ride along in the clear unless you set a passphrase on a backup or switch on **Encrypt the snapshot** for WebDAV; an exported configuration file is never encrypted, so keep it somewhere trusted. How Codeg handles secrets generally is under [Privacy & Security](/reference/privacy).
 - **Restore is a replace, but reversible.** It swaps in the backup's database and uploads wholesale — yet snapshots your current data first, and that snapshot is [listed with a Roll back button](#pre-restore-snapshots), so a mistaken restore can be walked back.
 - **The proxy is app-wide.** Once on, it carries git, agent installs, and model calls alike — the one path everything Codeg reaches out through.
 
@@ -115,4 +153,5 @@ Backup and restore operate on the data of the machine actually running Codeg. If
 - [Configuration](/getting-started/configuration) — setting the proxy, and other options, from the environment before the app starts.
 - [Version Control](/reference/settings/version-control) — the OS keychain that desktop backups deliberately exclude.
 - [Privacy & Security](/reference/privacy) — plaintext secrets, encryption, and what leaves your machine.
+- [Assistants](/guide/assistants) — one of the things configuration sync carries.
 - [Reference overview](/reference/) — the full 17-screen Settings map.

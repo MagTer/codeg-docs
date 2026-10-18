@@ -13,7 +13,9 @@ It's the hands-off counterpart to [Chat Channels](/guide/chat-channels): a chat 
 
 ## Where automations live
 
-Automations are their own view, opened from **Automations** in the left sidebar (the ⚡ item, right by your conversations). One toolbar runs across the top — a **folder** filter, an **enabled / disabled** filter, and **New** on the right — and below it a single panel splits into the list of your automations and the selected one's detail. If a scheduled run ever fails, the sidebar item carries a small badge so you notice — it clears when you open the view.
+Automations are their own view, opened from **Automations** in the left sidebar (the ⚡ item, right by your conversations). One toolbar runs across the top — a **folder** filter, an **enabled / disabled** filter, and **New automation** on the right — and below it a single panel splits into the list of your automations and the selected one's detail. If a scheduled run ever fails, the sidebar item carries a small badge so you notice — it clears when you open the view.
+
+Since **0.37.0** the side panel has an **Automations** tab too, listing the automations of the project you're in — its root's and its worktrees' — where you can run one now, switch it on or off, delete it, or read its detail and run history without leaving the conversation. Writing and editing one still happens here: **Open full page** brings you to this view already filtered to that project. → [The Side Panel](/guide/side-panel#the-project-s-automations-to-dos-issues-and-pull-requests)
 
 The first time in, there's nothing to show, so you land on a gallery of **templates** to start from.
 
@@ -31,7 +33,7 @@ Hit **New automation** and either pick a template or start blank. Codeg ships se
 | **TODO sweep** | Collect and prioritize `TODO`/`FIXME` comments |
 | **Release notes** | Summarize changes since the last release tag |
 
-A template just seeds the editor — a suggested prompt and cadence you then tweak. The editor itself is **the same composer you use for a normal conversation**: a rich prompt box with `@`-mentions for files, agents, sessions and commits, the `/` command menu for commands and [skills](/guide/skills) — with each command's arguments shown beside it since **0.35.0** — an agent picker, and the mode-and-options bar. Whatever you'd set up for a one-off message, you capture here as a reusable launch. Give it a name, write the prompt, and the rest is *where* and *when*.
+A template just seeds the editor — a suggested prompt and cadence you then tweak. The editor itself is **the same composer you use for a normal conversation**: a rich prompt box with `@`-mentions for files, agents, [assistants](/guide/assistants), sessions and commits, the `/` command menu for commands and [skills](/guide/skills) — with each command's arguments shown beside it since **0.35.0** — an agent picker, and, since **0.37.0**, the same **settings button** as the message box for the agent's model, mode and options. It shows what will be saved: your pick, or else the agent's current value. Whatever you'd set up for a one-off message, you capture here as a reusable launch. Give it a name, write the prompt, and the rest is *where* and *when*.
 
 ## Choose what a fire does
 
@@ -97,7 +99,7 @@ The scheduler lives inside Codeg — desktop app or [server](/getting-started/de
 
 You aren't the only one who can save an automation. An agent in a conversation can **park work instead of only doing it**: one tool saves an automation — on a cron schedule or manual — and its sibling queues a [to-do](/guide/tasks). *"This check should really run every night"* becomes a saved automation without you leaving the conversation to go build it.
 
-Both are **off by default**, under **Settings → Collaboration → In-conversation tools**. They're the two switches there that *write* app state rather than only reading it, so they're deliberately opt-in — and unlike the read-only tools, they're re-checked at the moment they're called, meaning switching one off stops a session that's already running from using it. → [Settings → General](/reference/settings/collaboration#in-conversation-tools)
+Both are **off by default**, under **Settings → Collaboration → In-conversation tools**. They're the two switches there that *write* app state rather than only reading it, so they're deliberately opt-in — and unlike the read-only tools, they're re-checked at the moment they're called, meaning switching one off stops a session that's already running from using it. → [Settings → Collaboration](/reference/settings/collaboration#in-conversation-tools)
 
 Two details worth knowing:
 
@@ -108,7 +110,7 @@ Whatever the agent saves is an ordinary automation — it shows up in this view,
 
 ## Manage them
 
-Each row — via the **⋯** menu or a right-click — gives you **Run now**, **Enable/Disable**, **Edit**, and **Delete**. On the detail side, the enable switch sits in the header and **Run now** / **Edit** sit directly under the title, above the schedule facts, the prompt, and the run history. When you have more than a couple, the toolbar's two filters narrow the list by **folder** or by **enabled state**; a folder filter left pointing at a folder that no longer holds any automations quietly falls back to *all*. The folder control is the [searchable picker](/guide/tasks#keep-the-board-tidy) the whole workbench uses — one row per folder reading *alias [ name ]* over its path, matching on all three — and so is the workspace folder in the automation editor.
+Each row — via the **⋯** menu or a right-click — gives you **Run now**, **Enable/Disable**, **Edit**, and **Delete**. On the detail side, the enable switch sits in the header and **Run now** / **Edit** sit directly under the title, above the schedule facts, the prompt, and the run history. When you have more than a couple, the toolbar's two filters narrow the list by **folder** or by **enabled state**, and since **0.37.0** the detail pane follows them, showing the selected automation or the first one left in the list. **New automation** starts a draft in the folder the list is filtered to — or, when that folder is closed in the sidebar, in an open worktree of it, the active one first — where it used to start in the first open folder every time, as it still does when neither applies. A folder that's closed in the sidebar is shown by its name in the filter rather than a number. A folder filter quietly falls back to *all* only when its folder is no longer offered at all — neither open as a project nor targeted by any automation. The folder control is the [searchable picker](/guide/tasks#keep-the-board-tidy) the whole workbench uses — one row per folder reading *alias [ name ]* over its path, matching on all three — and so is the workspace folder in the automation editor.
 
 ## Good to know
 

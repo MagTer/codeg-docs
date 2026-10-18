@@ -54,16 +54,20 @@ Codeg stamps each commit with the author identity from your [git account](#git-a
 
 ## Branch, merge, and rebase
 
-The **branch chip below the composer** — see [The Workspace](/guide/workspace#branch-and-run-git) — is your branch switcher. Since **0.30.0** it opens with a **Worktrees (n)** section listing the branches this repository has checked out in its *other* [worktrees](#work-in-parallel-with-worktrees) — the main working tree first, then the linked ones by name. Picking one takes you to that worktree, the same switch the sidebar does, so moving between parallel checkouts no longer means hunting for the branch in the full local list. The **main** working tree's branch is hoisted to the top as a plain row so it's never behind a fold; the linked worktrees below it group by shared prefix like any other branch list, and those groups start collapsed.
+The **branch chip** sits just below the composer and is your branch switcher. There's one per conversation, so when you [tile several sessions](/guide/workspace#tile-several-sessions-side-by-side) each one shows and switches its own branch. In [Chat mode](/guide/conversations#start-a-session-—-the-composer) there's no chip at all; in a folder that isn't a git repository it reads **No branch** and offers **Initialize Git repository**.
 
-Below it are your **local** and **remote** branches, folding shared prefixes like `feature/…` into collapsed groups and marking the checked-out one **Current** — Local still lists every local branch, worktree ones included. Pick a branch for its actions — **Switch to this branch**, **merge** it into the current branch, **rebase** the current branch onto it, **delete** it, or the two that don't need it checked out at all:
+Click it and one searchable list opens. A single search box at the top filters operations *and* branches together, so typing `push` finds the operation and typing part of a branch name gets you straight to the branch. From the top:
 
-- **Update** fast-forwards that branch to its upstream **without touching your working tree**, so you can bring `main` current while you're still on your feature branch. It deliberately refuses rather than forcing: a non-fast-forward is rejected, and so is a branch another worktree has checked out. Nothing is ever quietly rewritten under a tree you have open. (On the branch you're actually on, it's the ordinary pull, conflict handling included.)
+- **Operations** — the short list that acts on the branch you're on: **Pull code**, **Fetch remote branches**, **Commit code…**, **Push…**, **New branch…** and **New worktree…**. **New branch…** creates one from where you are and checks it out.
+- **Worktree branches** — since **0.30.0**, the branches this repository has checked out in its *other* [worktrees](#work-in-parallel-with-worktrees) — the main working tree first, then the linked ones by name. Picking one takes you to that worktree, the same switch the sidebar does, so moving between parallel checkouts no longer means hunting for the branch in the full local list. The **main** working tree's branch is hoisted to the top as a plain row so it's never behind a fold; the linked worktrees below it group by shared prefix like any other branch list, and those groups start collapsed.
+- **Local branches** and **Remote branches** — shared prefixes like `feature/…` fold into collapsed groups, and the checked-out branch is marked **Current**. Local still lists every local branch, worktree ones included.
+
+Pick a branch for its actions — **Switch to this branch**, **merge** it into the current branch, **rebase** the current branch onto it, **Delete branch**, or the two that don't need it checked out at all:
+
+- **Pull code** on another branch fast-forwards it to its upstream **without touching your working tree**, so you can bring `main` current while you're still on your feature branch. It deliberately refuses rather than forcing: a non-fast-forward is rejected, and so is a branch another worktree has checked out. Nothing is ever quietly rewritten under a tree you have open. (On the branch you're actually on, it's the ordinary pull, conflict handling included.)
 - **Push** opens the push window preselected for that branch, so you review the commits before they go out. An already-open push window is retargeted rather than left aimed at whatever it was opened for.
 
-**New branch…** creates one from where you are and checks it out. A single search box at the top filters branches *and* operations together, so you can type part of a branch name and get straight to it.
-
-There's one chip per conversation, so when you [tile several sessions](/guide/workspace#tile-several-sessions-side-by-side) each one shows and switches its own branch.
+A branch that a worktree has checked out also offers **Delete worktree** and **Delete worktree and branch** — see [Delete one when you're done with it](#delete-one-when-you-re-done-with-it).
 
 Switching uses a plain checkout, so Codeg won't move your uncommitted changes for you — **commit or stash first** if git would refuse. Stashing lives in the Changes tab's menu: **Stash changes** tucks your work away (optionally keeping the index staged), and **Unstash** lists your stashes to **apply** or **drop**.
 
@@ -144,6 +148,7 @@ To-do worktrees have their own routes on the board, which is usually where you w
 
 ## Next steps
 
-- [**The Workspace**](/guide/workspace) — the panels the Changes, Commits, and branch tools live in.
+- [**The Side Panel**](/guide/side-panel) — the panel the Changes and Commits tabs live in, beside the files and the session's details.
+- [**Conversations**](/guide/conversations) — the composer the branch chip sits under.
 - [**Multi-Agent Collaboration**](/guide/multi-agent) — put those parallel worktrees to work with a team of agents.
 - [**Automations**](/guide/automations) — run tasks headlessly, each in its own isolated worktree.

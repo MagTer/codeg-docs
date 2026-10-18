@@ -9,7 +9,7 @@ hero:
 homeFeatures:
   - icon: 📥
     title: 对话聚合
-    details: 将每个受支持智能体的会话导入统一、可搜索的工作区——无论出自哪种工具，都汇聚成同一条时间线。
+    details: 把各个智能体自己的历史会话导入统一、可搜索的工作区——无论出自哪种工具，都汇聚成同一条时间线。
     link: /zh/guide/aggregation
     linkText: 了解更多
   - icon: 🤝

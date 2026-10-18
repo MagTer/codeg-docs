@@ -17,11 +17,11 @@ Codeg 将每一项偏好都汇集到同一个**设置**窗口中（其侧边栏�
 | --------------- | ---------------- | ------------- |
 | **外观** | 主题模式与配色、窗口缩放、字体、聊天区域动画与宽度、桌面宠物 | [外观](/zh/reference/settings/appearance) |
 | **常规** | 默认终端、命令输出颜色、渲染、@ 提及面板、关闭按钮行为、桌面通知、任务栏 / Dock 提醒与提示音 | [常规](/zh/reference/settings/general) |
-| **协作** | 智能体之间的委派，以及每个智能体拿到的会话内工具 | [协作](/zh/reference/settings/collaboration) |
+| **协作** | 智能体之间的委派、你可以 @ 提及的助手，以及每个智能体拿到的会话内工具 | [协作](/zh/reference/settings/collaboration) |
 | **MCP** | Model Context Protocol 服务器 —— 添加、扫描、按智能体启用 | [指南 → MCP 服务器](/zh/guide/mcp) |
 | **Skills** | 编写和编辑你自己的智能体技能 | [指南 → 技能](/zh/guide/skills) |
 | **技能包** | 精选合集 —— 专家、科学研究、办公工具 —— 外加界面渲染技能和你自己的技能 | [指南 → 技能](/zh/guide/skills#enable-a-curated-skill-pack) |
-| **智能体** | 智能体 CLI —— 连接、配置、运行预检，以及[注册你自己的](/zh/guide/custom-agents) | [指南 → 使用智能体](/zh/guide/agents) |
+| **智能体** | 智能体 CLI —— 连接、配置、运行预检，以及[注册你自己的](/zh/guide/custom-agents) | [指南 → 使用智能体](/zh/guide/agents)、[各智能体配置](/zh/guide/agent-setup) |
 | **模型供应商** | 智能体使用的 API 提供商凭据 | [指南 → 认证与模型](/zh/guide/authentication) |
 | **快捷消息** | 供 composer 使用的可复用消息片段 | [快捷消息](/zh/reference/settings/quick-messages) |
 | **浏览器操作** | 内置浏览器 —— 链接在哪里打开、站点规则、智能体在页面上能看到和做什么 | [浏览器操作](/zh/reference/settings/browser) |
@@ -31,7 +31,7 @@ Codeg 将每一项偏好都汇集到同一个**设置**窗口中（其侧边栏�
 | **消息渠道** | 用于通知和远程控制的 IM 机器人 | [指南 → 聊天频道](/zh/guide/chat-channels) |
 | **Web 服务** | 将 Codeg 暴露给浏览器 —— 端口、令牌、二维码 *（仅桌面应用）* | [Web 服务](/zh/reference/settings/web-service) |
 | **运行日志** | 诊断日志 —— 级别、实时查看器、文件 | [运行日志](/zh/reference/settings/logs) |
-| **系统** | 更新、开机自启、网络代理、语言、备份与恢复 | [系统](/zh/reference/settings/system) |
+| **系统** | 更新、开机自启、网络代理、语言、配置同步、备份与恢复 | [系统](/zh/reference/settings/system) |
 
 打开设置后，你会首先看到**外观**。无论你运行桌面应用还是通过浏览器访问 Codeg，每个界面都在 —— 只有一个例外，它在浏览器会话里会从导航中去掉：**Web 服务**，因为正是这个界面*开启*了浏览器访问。另有两个界面虽然也在，但内容更少。**浏览器操作**只保留在浏览器里仍然决定着某些事的那几行 —— 站点规则（用于阻止）、终端里起的服务要怎么处理，以及终端的链接菜单。**电脑操作**作用于服务器所在机器自己的桌面，而且只有当那台服务器以 `CODEG_COMPUTER_USE=1` 启动时才可用。
 

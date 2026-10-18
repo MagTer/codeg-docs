@@ -54,11 +54,12 @@ New in **0.35.2**: which tabs the composer's **@** panel shows, and in what orde
 | Tab | Default |
 | --- | ------- |
 | **Agents** | Shown, first |
+| **Assistants** | Shown, second — new in **0.36.0**, listing your [assistants](/guide/assistants) |
 | **Files** | Always shown — its switch is locked on |
 | **Sessions** | Shown |
 | **Commits** | Shown |
 
-Drag a row by its handle, or focus the handle and use **↑** / **↓**. The panel opens on the **first tab in your order that has matches**, and **Tab** / **Shift+Tab** cycle through the shown tabs only. A hidden tab isn't just out of sight — its source isn't searched at all, so hiding **Sessions** and **Commits** also spares those lookups. **Reset**, greyed out while you're on the defaults, returns to the built-in order, and a tab added in a later release joins at the end, shown.
+Drag a row by its handle, or focus the handle and use **↑** / **↓**. The panel opens on the **first tab in your order that has matches**, and **Tab** / **Shift+Tab** cycle through the shown tabs only. A hidden tab isn't just out of sight — its source isn't searched at all, so hiding **Sessions** and **Commits** also spares those lookups. **Reset**, greyed out while you're on the defaults, returns to the built-in order. A tab added in a later release arrives shown, placed right after the nearest tab that comes before it in the built-in order — so **Assistants** lands just after **Agents**, wherever you'd moved it.
 
 It applies to every composer with an **@** panel: a conversation's, the [to-do](/guide/tasks) editor and follow-up box, and the [automation](/guide/automations) editor. Skills and commands were never tabs here — they come from **/**, or **$** in Codex. Every change saves at once, reaches your other windows as you make it, and is kept per device.
 

@@ -17,7 +17,9 @@ The panel is a *front door* to To-dos, not a parallel system. Everything it crea
 
 ## Open it
 
-**Repository panel** sits in the left sidebar beneath To-dos, and in the status bar's [quick actions](/guide/workspace#the-layout) under *Navigation*. Like Automations and To-dos it takes over the main area, with a **back arrow** in the top-right corner to return to your conversations.
+**Repository panel** sits in the left sidebar beneath To-dos, and in the status bar's [quick actions](/guide/workspace#the-layout) under *Navigation*. Like Automations and To-dos it takes over the main area; the **Back to Conversations** button at the start of its title returns you to your conversations.
+
+Since **0.37.0** the side panel also has **Issues** and **Pull requests** tabs — **Merge requests** on GitLab — showing this list for the project you're in: search, the state filter, **Assigned to me**, labels, **New issue**, and the same detail panel with **Start**. Switching folders, page sizes and the panel settings stay here. → [The Side Panel](/guide/side-panel#the-project-s-automations-to-dos-issues-and-pull-requests)
 
 Two buttons join the window's top-right cluster while it's open: **Refresh**, which reloads the whole list rather than narrowing it, and **Panel settings**. Refresh greys out until a repository is actually loaded; settings never does, since there's always a global row to change.
 
@@ -61,7 +63,7 @@ Since **0.28.2** the panel also carries the **discussion**, not just the descrip
 
 The thread is fetched **when you open the panel**, not with the list: folding it into the list would spend a request per row to draw a page whose reader opens at most one of them. On GitLab, the housekeeping events — *changed the milestone*, *assigned to* — are filtered out, so what you read is the conversation and matches the comment count on the row. A thread with hundreds of comments opens quickly because only what's on screen is drawn, the rest arriving as you scroll.
 
-A row whose item already has a task shows that instead of **Start** — a status chip that takes you to the board, plus a small **re-trigger** link where starting another run makes sense.
+A row whose item already has a task shows that instead of **Start** — a status chip that takes you to the board, plus a small **re-trigger** link where starting another run makes sense. The chip reads **Deferred** for a task you've set aside with [Handle later](/guide/tasks#set-it-aside-for-later).
 
 ### A change opens as three tabs
 

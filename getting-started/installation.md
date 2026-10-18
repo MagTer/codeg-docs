@@ -64,7 +64,7 @@ Codeg's UI runs on a **WebKitGTK** runtime (`libwebkit2gtk-4.1`). The `.deb` / `
 ## Desktop system requirements
 
 - A 64-bit desktop OS: **macOS** (Apple Silicon or Intel), **Windows 10/11**, or a modern **Linux** distribution with WebKitGTK.
-- To *drive* agents you need at least one agent CLI installed. Codeg can install and manage most of them for you — via `npx`, `uvx`, or a prebuilt binary — from **Settings → Agents**. A few (the `npx`- and `uvx`-based ones) expect **Node.js** or **[uv](https://docs.astral.sh/uv/)** on your `PATH`. See [Supported Agents](/guide/supported-agents).
+- To *drive* agents you need at least one agent CLI installed. Codeg can install and manage most of them for you — via `npx` or a prebuilt binary — from **Settings → Agents**; the `npx`-based ones expect **Node.js** on your `PATH`. Two, **Kiro CLI** and **TRAE CLI**, you install with their vendors' own installers, and Codeg picks them up from there. See [Supported Agents](/guide/supported-agents).
 
 ::: tip Multi-agent delegation works out of the box
 The desktop app bundles the `codeg-mcp` companion, so [multi-agent collaboration](/guide/multi-agent) is available immediately — no extra setup.
@@ -82,7 +82,7 @@ Three steps take you from a fresh install to a running session:
 
 - **iPhone and iPad:** updates arrive through the App Store.
 - **Android:** download new APKs and their SHA-256 checksums from the [Android releases page](https://github.com/xintaofei/codeg-android/releases/latest).
-- **Desktop:** **Settings → System → Software Update** downloads the signed release and restarts Codeg. See [System settings](/reference/settings/system).
+- **Desktop:** **Settings → System → Software Update** downloads the signed release and restarts Codeg — on Windows, by closing it and letting the installer reopen it. Since **0.36.0** an update installs only if its signature names the version on offer. See [System settings](/reference/settings/system#software-update).
 
 ## Other ways to connect
 

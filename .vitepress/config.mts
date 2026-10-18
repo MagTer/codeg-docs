@@ -53,8 +53,8 @@ export default defineConfig({
     ]
   },
 
-  // Earlier code-grounded drafts — and the zh translation guide — are kept under
-  // drafts/ for reference but are not part of the built site.
+  // drafts/ holds the zh translation guide (conventions + glossary for the zh
+  // mirror); it's kept in the repo but is not part of the built site.
   srcExclude: ['drafts/**'],
 
   themeConfig: {
@@ -123,11 +123,11 @@ export default defineConfig({
               text: 'Essentials',
               items: [
                 { text: 'The Workspace', link: '/guide/workspace' },
-                { text: 'Built-in Browser', link: '/guide/browser' },
-                { text: 'Computer Use', link: '/guide/computer-use' },
+                { text: 'Conversations', link: '/guide/conversations' },
+                { text: 'The Side Panel', link: '/guide/side-panel' },
+                { text: 'Git & Worktrees', link: '/guide/git' },
                 { text: 'Infinite Canvas', link: '/guide/canvas' },
                 { text: 'Conversation Aggregation', link: '/guide/aggregation' },
-                { text: 'Git & Worktrees', link: '/guide/git' },
                 { text: 'Token Usage', link: '/guide/token-usage' }
               ]
             },
@@ -136,9 +136,25 @@ export default defineConfig({
               items: [
                 { text: 'Working with Agents', link: '/guide/agents' },
                 { text: 'Supported Agents', link: '/guide/supported-agents' },
-                { text: 'Custom Agents', link: '/guide/custom-agents' },
+                { text: 'Per-Agent Setup', link: '/guide/agent-setup' },
                 { text: 'Authentication & Models', link: '/guide/authentication' },
-                { text: 'Multi-Agent Collaboration', link: '/guide/multi-agent' }
+                { text: 'Custom Agents', link: '/guide/custom-agents' }
+              ]
+            },
+            {
+              text: 'Collaboration',
+              items: [
+                { text: 'Multi-Agent Collaboration', link: '/guide/multi-agent' },
+                { text: 'Assistants', link: '/guide/assistants' }
+              ]
+            },
+            {
+              text: 'Tools & Extensions',
+              items: [
+                { text: 'Built-in Browser', link: '/guide/browser' },
+                { text: 'Computer Use', link: '/guide/computer-use' },
+                { text: 'MCP Servers', link: '/guide/mcp' },
+                { text: 'Skills', link: '/guide/skills' }
               ]
             },
             {
@@ -148,13 +164,6 @@ export default defineConfig({
                 { text: 'Automations', link: '/guide/automations' },
                 { text: 'To-dos', link: '/guide/tasks' },
                 { text: 'Repository Panel', link: '/guide/repository' }
-              ]
-            },
-            {
-              text: 'Extending Codeg',
-              items: [
-                { text: 'MCP Servers', link: '/guide/mcp' },
-                { text: 'Skills', link: '/guide/skills' }
               ]
             },
             {
@@ -240,11 +249,11 @@ export default defineConfig({
               text: '核心功能',
               items: [
                 { text: '工作区', link: '/zh/guide/workspace' },
-                { text: '内置浏览器', link: '/zh/guide/browser' },
-                { text: '电脑操作', link: '/zh/guide/computer-use' },
+                { text: '对话', link: '/zh/guide/conversations' },
+                { text: '右侧面板', link: '/zh/guide/side-panel' },
+                { text: 'Git 与 Worktree', link: '/zh/guide/git' },
                 { text: '无限画布', link: '/zh/guide/canvas' },
                 { text: '对话聚合', link: '/zh/guide/aggregation' },
-                { text: 'Git 与 Worktree', link: '/zh/guide/git' },
                 { text: 'Token 用量', link: '/zh/guide/token-usage' }
               ]
             },
@@ -253,9 +262,25 @@ export default defineConfig({
               items: [
                 { text: '使用智能体', link: '/zh/guide/agents' },
                 { text: '支持的智能体', link: '/zh/guide/supported-agents' },
-                { text: '自定义智能体', link: '/zh/guide/custom-agents' },
+                { text: '各智能体配置', link: '/zh/guide/agent-setup' },
                 { text: '认证与模型', link: '/zh/guide/authentication' },
-                { text: '多智能体协作', link: '/zh/guide/multi-agent' }
+                { text: '自定义智能体', link: '/zh/guide/custom-agents' }
+              ]
+            },
+            {
+              text: '协作',
+              items: [
+                { text: '多智能体协作', link: '/zh/guide/multi-agent' },
+                { text: '助手', link: '/zh/guide/assistants' }
+              ]
+            },
+            {
+              text: '工具与扩展',
+              items: [
+                { text: '内置浏览器', link: '/zh/guide/browser' },
+                { text: '电脑操作', link: '/zh/guide/computer-use' },
+                { text: 'MCP 服务器', link: '/zh/guide/mcp' },
+                { text: '技能', link: '/zh/guide/skills' }
               ]
             },
             {
@@ -265,13 +290,6 @@ export default defineConfig({
                 { text: '自动化', link: '/zh/guide/automations' },
                 { text: '待办任务', link: '/zh/guide/tasks' },
                 { text: '仓库面板', link: '/zh/guide/repository' }
-              ]
-            },
-            {
-              text: '扩展 Codeg',
-              items: [
-                { text: 'MCP 服务器', link: '/zh/guide/mcp' },
-                { text: '技能', link: '/zh/guide/skills' }
               ]
             },
             {

@@ -45,7 +45,7 @@ An import marks what it brings in as **Review** rather than *Completed* — they
 
 ## What Codeg matches
 
-A sweep looks at **every agent Codeg supports** — even the ones you haven't enabled in Codeg. For each, it reads that agent's native session store (Claude Code's `~/.claude/projects`, Codex's `~/.codex/sessions`, OpenCode's local database, and so on) and works out which project directory each session ran in.
+A sweep looks at **every agent Codeg supports** — even the ones you haven't enabled in Codeg. For each, it reads that agent's native session store (Claude Code's `~/.claude/projects`, Codex's `~/.codex/sessions`, OpenCode's local database, Kiro CLI's `~/.kiro/sessions/cli`, and so on) and works out which project directory each session ran in. Three are the exception: for **ZCode**, **TRAE CLI** and **Command Code**, Codeg doesn't read the agent's own store yet, so a sweep finds only the conversations you ran in Codeg — sessions from their own terminals can't be imported. → [Where each agent keeps its sessions](/guide/supported-agents#where-each-agent-keeps-its-sessions)
 
 That path is the whole rule: **a session is filed under the directory you ran it in.** So the list you get is every agent's history, grouped by project — and an agent you set up long before Codeg still surfaces its past work, as long as its files are on disk.
 
@@ -114,7 +114,7 @@ Read what it tried, then take a different approach.
 - **Brief a fresh session cheaply.** Rather than re-explaining a long thread, start clean and point at the old one — useful when a conversation has grown too long to work in comfortably.
 - **Combine it with delegation.** A lead can read a referenced session and then hand the follow-up to a sub-agent. → [Multi-Agent Collaboration](/guide/multi-agent#pick-up-where-another-session-left-off)
 
-This needs **Get session info** switched on in **Settings → Collaboration** — it is by default. If a referenced session has since been deleted, the lookup simply reports that rather than failing. → [Settings → General](/reference/settings/collaboration#in-conversation-tools)
+This needs **Get session info** switched on in **Settings → Collaboration** — it is by default. If a referenced session has since been deleted, the lookup simply reports that rather than failing. → [Settings → Collaboration](/reference/settings/collaboration#in-conversation-tools)
 
 ## Next steps
 

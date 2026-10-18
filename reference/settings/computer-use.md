@@ -17,12 +17,12 @@ It's the same setting as the **See and use your desktop's windows** row in [Coll
 
 ## Driver
 
-*Desktop app, or a server started with `CODEG_COMPUTER_USE`.* One row, **cua-driver**, showing its state — *Not installed*, *Downloading…*, *Installed · 0.32.0*, or an older release installed while this Codeg runs another — and, once installed, the path it's kept at.
+*Desktop app, or a server started with `CODEG_COMPUTER_USE`.* One row, **cua-driver**, showing its state — *Not installed*, *Downloading…*, *Installed · 0.36.0*, or an older release installed while this Codeg runs another — *0.32.0 is installed; this codeg runs 0.36.0* after the upgrade to 0.37.0 — and, once installed, the path it's kept at.
 
 - **Install** fetches it now instead of on first use; **Upgrade to …** takes its place when only an older release is cached.
 - **Uninstall** asks first, then switches computer use off and ends every share. Switching back on downloads the driver again.
 
-Codeg runs exactly one release — **0.32.0** — from the Cua project's GitHub releases, checked against a SHA-256 digest pinned in Codeg. There's no choosing another. → [The driver](/guide/computer-use#the-driver)
+Codeg runs exactly one release — **0.36.0** since **0.37.0**, 0.32.0 before — from the Cua project's GitHub releases, checked against a SHA-256 digest pinned in Codeg. There's no choosing another. → [The driver](/guide/computer-use#the-driver)
 
 ## Permissions
 

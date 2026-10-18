@@ -40,7 +40,7 @@ docker run -d -p 3080:3080 \
   ghcr.io/spacering-net/codeg:latest
 ```
 
-Images are published multi-arch (amd64 + arm64) to `ghcr.io/spacering-net/codeg` and Docker Hub `xintaofei/codeg`, tagged with each release's version (`:0.35.2`). `:latest` follows **stable** releases only — a release candidate gets a version tag of its own, ending in `-rc.N`, and never moves `latest`.
+Images are published multi-arch (amd64 + arm64) to `ghcr.io/spacering-net/codeg` and Docker Hub `xintaofei/codeg`, tagged with each release's version (`:0.37.0`). `:latest` follows **stable** releases only — a release candidate gets a version tag of its own, ending in `-rc.N`, and never moves `latest`.
 
 ::: warning Pulling from `ghcr.io/xintaofei/codeg`? Switch names
 Codeg's repository moved to `spacering-net/codeg`, and since **0.34.0** GitHub's registry publishes under the new name. **`ghcr.io/xintaofei/codeg` stays at 0.33.0** — a container or Compose file that still names it keeps pulling that release and never updates again. Change the image to `ghcr.io/spacering-net/codeg`; the `codeg-data` volume isn't tied to the image name, so your data comes along. Docker Hub's `xintaofei/codeg` carries on as before.
@@ -212,7 +212,7 @@ Codeg has no switch for it; to remove the copy, clear the site's data in your br
 
 ## Keep your server up to date
 
-Like the desktop app, `codeg-server` updates itself from **Settings → Software Update**: it downloads the signed release for its platform, verifies the signature, swaps the binaries and web assets on disk, and restarts — no redeploy. The previous version is retained, so the same screen offers a **Roll back**. This is Linux/macOS only (disabled on Windows). A server that can't write to its own installation — a binary or web folder it doesn't own, a full disk — says so on that screen **before** you try, since **0.32.1**, and offers the release page for a manual update instead.
+Like the desktop app, `codeg-server` updates itself from **Settings → Software Update**: it downloads the signed release for its platform, verifies the signature — which, since **0.36.0**, must name the very version on offer, so an older signed archive can't pass for a newer one — swaps the binaries and web assets on disk, and restarts — no redeploy. The previous version is retained, so the same screen offers a **Roll back**. This is Linux/macOS only (disabled on Windows). A server that can't write to its own installation — a binary or web folder it doesn't own, a full disk — says so on that screen **before** you try, since **0.32.1**, and offers the release page for a manual update instead.
 
 Run it under its supervisor to make upgrades safe:
 

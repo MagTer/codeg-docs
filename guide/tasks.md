@@ -33,11 +33,13 @@ to do → queued → setting up → running ⇄ awaiting input → to review →
 
 with **failed** and **canceled** as side paths off it. Two rules hold throughout. **Done is written in exactly two places** — a merge that git confirms landed, and the [**Complete**](#review-the-result) action for a task with nothing to merge — and once written it never rolls back. And **a task never skips the review stop**: every route to done goes through it, including an automatic merge.
 
-That's what separates a task from the two things next to it. A [conversation](/guide/workspace) is you and an agent, turn by turn, in your own working tree. An [automation](/guide/automations) is a session that fires on a clock. A task is neither: it's a unit of work with a beginning, an isolated place to happen, and an acceptance gate at the end.
+That's what separates a task from the two things next to it. A [conversation](/guide/conversations) is you and an agent, turn by turn, in your own working tree. An [automation](/guide/automations) is a session that fires on a clock. A task is neither: it's a unit of work with a beginning, an isolated place to happen, and an acceptance gate at the end.
 
 ## Open To-dos {#open-the-board}
 
-**To-dos** sits in the left sidebar, under Automations. It takes over the main area the same way Automations does — a **back arrow** in the top-right corner returns you to your conversations, with whatever tab you had open still there — and it carries a small **count badge** when tasks are waiting on you: anything in *awaiting input*, *to review*, or *failed*, so you can tell from any screen that there's something to look at.
+**To-dos** sits in the left sidebar, under Automations. It takes over the main area the same way Automations does — the **Back to Conversations** button at the start of its title returns you to your conversations, with whatever tab you had open still there — and it carries a small **count badge** when tasks are waiting on you: anything in *awaiting input*, *to review*, or *failed* — except what you've [set aside for later](#set-it-aside-for-later) or archived — so you can tell from any screen that there's something to look at.
+
+Since **0.37.0** you don't always need the page: the side panel's **To-dos** tab shows the board of the project you're in as stacked sections, with search, **New task**, and every card action and dialog the board has. Dragging, the list view and task settings stay here. → [The Side Panel](/guide/side-panel#the-project-s-automations-to-dos-issues-and-pull-requests)
 
 Its two controls live in the **window's top-right cluster**, beside the settings gear: a **view toggle** and **Task settings**. They cost nothing in width — a full-page route hides the terminal and aux-panel toggles, which would have nothing to act on, and these take the slots.
 
@@ -50,11 +52,11 @@ The **board** is four columns:
 | **To do** | Written down, not started — plus anything queued behind the concurrency limit, and anything scheduled for later |
 | **In progress** | Being set up, or an agent is working on it right now |
 | **Needs you** | Blocked on a question, finished and waiting for review, mid-merge, or failed |
-| **Done** | Merged, or completed with nothing to merge (and, if you ask for them, canceled ones) |
+| **Done** | Merged, or completed with nothing to merge (and, if you ask for them, canceled ones) — plus whatever you've [set aside for later](#set-it-aside-for-later), under a grey **Deferred** chip |
 
 Every column orders **freshest first**, so whatever just moved, retried, or finished is at the top of its column rather than buried under older work.
 
-The **list** is the same tasks as one flat, freshest-first table — **Status · Task · Location · Changes · Updated** — with a **Status** filter that speaks the four column names. Its rows show every action they offer as a labelled icon button instead of hiding most of them behind an overflow menu, so the list is the faster surface once you have more tasks than fit in four columns. Your choice of view is remembered.
+The **list** is the same tasks as one flat, freshest-first table — **Status · Task · Location · Changes · Updated** — with a **Status** filter that speaks the four column names — a deferred task counts as *Done* there too. Its rows show every action they offer as a labelled icon button instead of hiding most of them behind an overflow menu, so the list is the faster surface once you have more tasks than fit in four columns. Your choice of view is remembered.
 
 Cards carry the status, then a meta line reading *folder / branch · `+`/`−` line count · a relative time*. That last one is the most recent milestone the task actually reached — done or canceled, else review or failed, else started, else created. While a task is live the card also shows the **latest milestone the agent reported**, so the column tells you what's happening without opening anything. Click a card for its detail drawer — since **0.28** it slides in from the right rather than covering the board, so the column you were reading stays visible behind it. The round buttons on the right of a card are its actions.
 
@@ -68,7 +70,7 @@ Beside each title sits the **mark of the agent that's on it** — resolved exact
 - **Task description** — the full composer, the same one you use for a conversation: `@` to reference files, `/` for commands, `$` for Codex skills, the **+** menu for skills and quick messages, and **attachments**. A bug report can be a screenshot and nothing else.
 - **Target** — the project folder it runs in. Only **project roots** are offered; a task can't be based on a worktree, since it creates one of its own. A task that has already run is pinned to its folder.
 - **Base branch** — the branch the task starts from and lands back on. Left alone it reads **HEAD**, with the branch your project folder is on beside it, and means *the current branch when the task starts*; pick a local branch from the list to pin another. It's fixed once the task has a worktree, and a task that came from a pull request doesn't ask, since it starts from the pull request.
-- **Agent and mode** — these start out *inherited from task settings* and stay that way until you touch them. Override one for this task and a **Reset to inherited** control appears to give it back. Since **0.33.0** the line under the agent says which you've got. When task settings name no agent, or name one that isn't available here, the picker still shows one you can run — and that one is **saved with the task**, so the agent you see is the agent that runs. Before, it could show an agent nothing had saved, and the task then failed to start with *no agent configured*.
+- **Agent and its settings** — these start out *inherited from task settings* and stay that way until you touch them. The agent is the pill above the description; since **0.37.0** its model, mode and other options sit on one **settings button** in the description box's bottom bar — the same button and panel as a [conversation's composer](/guide/conversations#start-a-session-—-the-composer) — instead of a dropdown per option, and it shows what will be saved: your pick, or else the agent's current value. Override one for this task and a **Reset to inherited** control appears to give it back. Since **0.33.0** the line under the agent says which you've got. When task settings name no agent, or name one that isn't available here, the picker still shows one you can run — and that one is **saved with the task**, so the agent you see is the agent that runs. Before, it could show an agent nothing had saved, and the task then failed to start with *no agent configured*.
 
 That's not only the new-task box. **Every to-do input is the full composer** — editing a task, following up on a reviewed one, leaving a note on a retry — so you can point at a file or paste an image wherever you're typing.
 
@@ -123,6 +125,8 @@ While it works, the agent has two extra tools that exist only inside a task run:
 - **`task_progress`** — a one-line milestone (*"tests passing, starting cleanup"*) that lands on the card and the timeline in real time.
 - **`task_complete`** — the verdict, called once at the end: **success**, **needs_review** (it works, but look at this), or **blocked** (couldn't finish, and why). Success and needs-review send the task to review; blocked marks it failed.
 
+Both show up in the task's conversation as cards. Since **0.37.0** expanding one shows the whole message or summary, formatted, with a line saying whether it was **Recorded on the work task** — where Claude Code and Codex used to show a bare `{"recorded":true}`.
+
 ::: tip These two aren't tied to the Collaboration toggles
 `task_progress` and `task_complete` are injected only into task runs, so they don't depend on delegation, live feedback, or anything else in [Settings → Collaboration](/reference/settings/collaboration). And they're advisory: if the agent never calls `task_complete`, the task still settles normally when its turn ends — into review, unless the turn [ended on an agent error](#when-a-task-needs-you).
 :::
@@ -137,6 +141,18 @@ A task lands in **Needs you** for four different reasons, and the status on the 
 - **Failed** — the run errored, was interrupted by a restart, or the agent reported **blocked**. Since **0.35.2** that includes a turn that **ended on an agent error** and left nothing else behind — an upstream `400` after a cut-off tool call, say, which still closes the turn as if it had finished: with no reply, no change and no verdict, the task fails and the card shows **the agent's own message**, its last 4,000 characters. It used to slide quietly into *To review*, or, for a turn that stopped some other way, say only that the agent stopped. A turn that wrote a reply, changed files or reported a verdict goes to review as before. **Retry** picks up in the same worktree, told that the previous attempt was interrupted and to carry on; you can add a **note** for that next run.
 
 **View session** is how you unblock the first one. It opens a read-only live view of the task's agent session — and while it's read-only for *prompting*, it does render the permission dialog and the question card, so this is where you answer. The viewer streams live for a running task and shows the stored transcript for a settled one, split into the phases the task went through: **Task run**, **Retry run**, **Follow-up**, and **Merge**. It opens **nested inside the task drawer** that launched it, so backing out of the transcript returns you to the task rather than to nothing. Since **0.30.3** a file the transcript mentions opens **beside it** rather than in the workspace column the board is covering — a file badge, a Markdown link or **view diff** brings up a read-only viewer next to the messages, with **Open in workspace** one click away. → [the same panel on the canvas](/guide/canvas#a-card-is-a-real-conversation)
+
+### Set it aside for later
+
+Not everything in *Needs you* deserves your attention today. Since **0.36.0** a task that's **to review** or **failed** — an interrupted one included — offers **Handle later**: a clock button on the card and the list row, and an action in the drawer. The task moves to **Done** exactly as it is, under a grey **Deferred** chip whose tooltip names its real status — *Deferred · To review*, say — and it stops counting toward the badge. Nothing else changes: its status is untouched, and its worktree and session stay where they were.
+
+Coming back is just as quick:
+
+- **Follow up** leads on a deferred reviewed task. On the card it opens a dialog with the same four [intents](#say-what-kind-of-follow-up-you-mean) as the drawer's follow-up; send, and the task starts again straight away, the card moving to *In progress*.
+- **Retry** still works on a deferred failed one.
+- **Back to Needs you** takes the mark off and puts it back where it was.
+
+Any other way of settling it — a merge, *Complete*, a push back to the forge, *Abandon*, a follow-up or a retry — clears the mark as well, and a merge that bounces lands back in *Needs you*. Two things leave a deferred task alone on purpose: [Merge automatically](#let-a-folder-land-them-for-you) skips it, and **Archive all** passes over it. A task that's *awaiting input*, *merging* or *queued to merge* doesn't offer it — a live agent or a merge in flight isn't something to put off.
 
 ### If its worktree went missing
 
@@ -164,6 +180,8 @@ Four ways out:
 - **Follow up** — another pass. See below.
 - **Complete** — mark it done with no merge at all. Offered when the task **changed no files** — it answered a question, or verified work that was already right — so nothing has to be landed and no empty merge commit is created. You still choose whether to keep its worktree.
 - **Abandon** — drop it without merging, optionally recording **why** on the timeline. The task goes to canceled, and since **0.30.0** the dialog can take the worktree with it, so a stop that's really an abandon reclaims its disk in one gesture. The checkbox starts **unchecked** and is deliberately *not* seeded from the folder's delete-worktree default — that default is about landing finished work, whereas a canceled task can be **Requeued**, and this cleanup deletes the work branch along with the directory. Leave it unchecked and nothing is stranded either: the drawer offers the removal on its own afterwards.
+
+Or put the decision off: **Handle later** moves it to *Done* as it is, until you're ready — see [above](#set-it-aside-for-later).
 
 A task that came from the [Repository panel](/guide/repository) gets a fifth: **Open pull request**, or **Push to the pull request** if that's where it came from. Instead of landing the work in your own checkout, it pushes the branch to the forge — and for a task that came from a pull request it **replaces** Merge, since that work belongs on the pull request's branch rather than in your base. A push back that would carry **nothing** is refused, and points you at *Complete* instead — the honest ending for a task whose answer was that nothing needed changing. → [Take the result back](/guide/repository#take-the-result-back)
 
@@ -218,6 +236,7 @@ What it deliberately won't do is push through a problem:
 - **A red or still-pending preflight waits for you.** Only a green light qualifies; without a preflight command there's no gate at all.
 - **A task that changed nothing is left alone** — that's *Complete*'s territory, and it's your call.
 - **A missing worktree is left alone**, for the same reason.
+- **A task you set aside with Handle later is left alone** until you bring it back.
 - **A failure banners the card and stops.** It is **never retried unattended** — a merge that failed once would only fail in a loop, so the row waits for a human and the sweep moves on.
 
 ## Task settings
@@ -228,7 +247,7 @@ Below that, four tabs — one decision each:
 
 | Tab | Setting | What it does |
 | --- | ------- | ------------ |
-| **General** | **Default agent** | The agent tasks in this folder run with, unless a task overrides it |
+| **General** | **Default agent** | The agent tasks in this folder run with, unless a task overrides it — with its model, mode and options on the same settings button as the composer |
 | | **Process automatically** | To-dos start on their own, up to the concurrency limit |
 | | **Max concurrent tasks** | How many run at once, per folder. Default **2**; `0` = unlimited |
 | **Merge** | **Default merge strategy** | Squash or full history, offered as two side-by-side choices. Read when a merge starts — the merge dialog doesn't ask |
@@ -280,7 +299,7 @@ The split earns its keep because what belongs in one stage is nothing like what 
 - **Search** with the **Search tasks** box in the toolbar — since **0.35.2**, on the board and the list alike. It filters as you type, ignores case, and wants **every word** you type to match somewhere: the title, the branches, the folder, the agent, and either the description or, for a task from the [Repository panel](/guide/repository), its repository, item number, item title and URL. **`#12`** is exact — the task numbered 12, or the one made from issue or pull request 12 — while a bare `12` also finds #112. Columns with nothing left say **No matches**, the list offers **Clear search**, Escape clears it too, and the box starts empty each time you open To-dos.
 - **Filter by folder** with the dropdown, by status in list view, and by visibility with the **Filter** menu: **Show canceled** (on by default) and **Show archived** (off). The filter button badges itself when you've moved away from those defaults.
 - **The folder picker searches.** It's the same list the new-conversation composer uses — a search box, and one row per folder reading *alias [ name ]* over its full path. Typing matches the alias, the real directory name **and** the path, so two folders you've aliased alike are still tellable apart, and a folder you know only by its on-disk name is still findable. The task editor's target folder and the settings scope picker use it too.
-- **Archive** takes a task off the board without deleting it, once it's reached an end — done, failed, or canceled; **Archive all** clears everything the Done column is currently showing. An archived card offers exactly one action — **Unarchive**.
+- **Archive** takes a task off the board without deleting it, once it's reached an end — done, failed, or canceled; **Archive all** clears everything the Done column is currently showing, apart from deferred tasks, which wait for you to deal with them. An archived card offers exactly one action — **Unarchive**.
 - **Requeue** puts a canceled task back in *To do*, reusing its worktree — with an optional note about what should change this time.
 - **Delete** removes a task entirely, cancelling an active run first, with an opt-in checkbox to **also delete its worktree**.
 - **Delete worktree** — a glyph-only button in the detail drawer's bottom bar, immediately left of delete. Merging, completing and — since **0.28.2** — delivering to a pull request all *offer* to take the worktree along, and all let you say no, so a finished task can end up holding a checkout nobody will open again. This reclaims that disk **without touching the task**: the directory and its work branch go, the card stays on the board, and its conversation is re-parented to the project folder. It's confirmed first, and it only appears when there's something to remove and no failed cleanup is already showing its own retry.

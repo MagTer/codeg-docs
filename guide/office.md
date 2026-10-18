@@ -82,5 +82,5 @@ It opens a document **once**. A preview you close stays closed: since **0.31.2**
 
 - [**Skills**](/guide/skills) — how enabling a pack per agent works, and how to write your own skills.
 - [**Scientific Research**](/guide/research) — the other curated domain pack, from hypothesis to write-up.
-- [**The Workspace**](/guide/workspace) — the file tabs and preview surface these documents open in.
+- [**The Side Panel**](/guide/side-panel#work-with-files-—-editor-diffs-and-previews) — the file tabs and preview surface these documents open in.
 - [**Working with Agents**](/guide/agents) — pick and sign in the agent that will do the authoring.

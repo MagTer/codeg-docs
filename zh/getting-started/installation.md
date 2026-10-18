@@ -64,7 +64,7 @@ Codeg 的界面运行在 **WebKitGTK** 运行时（`libwebkit2gtk-4.1`）之上�
 ## 桌面系统要求 {#desktop-system-requirements}
 
 - 一个 64 位桌面操作系统：**macOS**（Apple Silicon 或 Intel）、**Windows 10/11**，或带有 WebKitGTK 的现代 **Linux** 发行版。
-- 要*驱动*智能体，你至少需要安装一个智能体 CLI。Codeg 可以在 **设置 → 智能体**中为你安装和管理其中大多数——通过 `npx`、`uvx` 或预构建的二进制文件。少数（基于 `npx` 和 `uvx` 的）需要在你的 `PATH` 中有 **Node.js** 或 **[uv](https://docs.astral.sh/uv/)**。参见[支持的智能体](/zh/guide/supported-agents)。
+- 要*驱动*智能体，你至少需要安装一个智能体 CLI。Codeg 可以在 **设置 → 智能体**中为你安装和管理其中大多数——通过 `npx` 或预构建的二进制文件；基于 `npx` 的那些需要在你的 `PATH` 中有 **Node.js**。另有两个——**Kiro CLI** 和 **TRAE CLI**——要用各自厂商的官方安装程序来安装，Codeg 再从那里找到它们。参见[支持的智能体](/zh/guide/supported-agents)。
 
 ::: tip 多智能体委派开箱即用
 桌面应用捆绑了 `codeg-mcp` 伴生程序，因此[多智能体协作](/zh/guide/multi-agent)可立即使用——无需额外设置。
@@ -82,7 +82,7 @@ Codeg 的界面运行在 **WebKitGTK** 运行时（`libwebkit2gtk-4.1`）之上�
 
 - **iPhone 与 iPad：**通过 App Store 获取更新。
 - **Android：**从 [Android 发布页](https://github.com/xintaofei/codeg-android/releases/latest)下载新的 APK 与 SHA-256 校验值。
-- **桌面端：** **设置 → 系统 → 软件更新**会下载经过签名的版本并重启 Codeg。参见[系统设置](/zh/reference/settings/system)。
+- **桌面端：** **设置 → 系统 → 软件更新**会下载经过签名的版本并重启 Codeg——在 Windows 上，则是先关闭它，再由安装程序重新打开它。自 **0.36.0** 起，只有当更新的签名写明的正是所提供的那个版本时，它才会被安装。参见[系统设置](/zh/reference/settings/system#software-update)。
 
 ## 其他连接方式 {#other-ways-to-connect}
 

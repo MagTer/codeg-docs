@@ -17,7 +17,7 @@ The status-bar panel carries a **Preview** badge, and it means it. Computer use 
 
 1. **Settings → Computer Use → Enable computer use.** It's off by default, and it's one switch shown in three places: this page, the **See and use your desktop's windows** row in [Settings → Collaboration](/reference/settings/collaboration#in-conversation-tools), and the codeg-mcp popover in the status bar. Flip any of them and the others follow.
 2. **On macOS, grant two permissions** — **Accessibility** and **Screen Recording** — to **`codeg-computer-helper`**, *not* to Codeg. The **Permissions** section on the same page has a **Grant…** button for each, asks for one at a time, and updates by itself when you come back from System Settings. Why the helper rather than Codeg is explained [below](#why-a-helper-holds-the-permissions-on-macos). Windows and Linux ask for nothing.
-3. **Start the agent after the switch is on.** The tools are handed to an agent when it launches, so a conversation whose agent was already running doesn't gain them. A new conversation gets them; an existing one does the next time its agent starts. They travel the way every [companion](/reference/architecture#multi-agent-delegation-and-codeg-mcp) tool does, so an agent that takes no MCP servers never gets them — **OpenClaw** and **Pi** among the built-ins.
+3. **Start the agent after the switch is on.** The tools are handed to an agent when it launches, so a conversation whose agent was already running doesn't gain them. A new conversation gets them; an existing one does the next time its agent starts. They travel the way every [companion](/reference/architecture#multi-agent-delegation-and-codeg-mcp) tool does, so an agent that takes no MCP servers over the protocol never gets them — **OpenClaw**, **Pi** and, since **0.36.0**, **Cline** among the built-ins.
 
 The **driver** comes down by itself the first time computer use needs it, or press **Install** under *Driver* to fetch it now. → [The driver](#the-driver)
 
@@ -130,7 +130,7 @@ Every entry, defaults included, can be removed. Add an app by its **bundle ID** 
 
 ## The driver
 
-Computer use reads and acts on windows through **cua-driver**, an open-source program from the [Cua](https://github.com/trycua/cua) project. Codeg runs exactly one release of it — **0.32.0** — and you can't pick another. It's downloaded the first time computer use needs it, checked against a SHA-256 digest pinned in Codeg before it's unpacked and again before every launch, and on macOS its developer signature is checked too.
+Computer use reads and acts on windows through **cua-driver**, an open-source program from the [Cua](https://github.com/trycua/cua) project. Codeg runs exactly one release of it — **0.36.0** since Codeg **0.37.0**, 0.32.0 before — and you can't pick another. After an upgrade the older release stays on disk until you uninstall it, and the new one downloads by itself the next time computer use needs it, or straight away with **Upgrade to …** on the [settings page](/reference/settings/computer-use#driver). It's downloaded the first time computer use needs it, checked against a SHA-256 digest pinned in Codeg before it's unpacked and again before every launch, and on macOS its developer signature is checked too.
 
 **Install** and **Uninstall** sit under **Driver** on the settings page, which also prints where it's kept — Codeg's download cache, beside the agent binaries. Uninstalling switches computer use off and ends every share; switching it back on downloads the driver again.
 
@@ -163,6 +163,8 @@ A browser reaching the **desktop app's own** [Web Service](/reference/settings/w
 | Entire screen | Yes | Yes | No |
 | Menu commands by title | Yes | No | Yes |
 | Restoring a minimized window | In place | In place, without activating it | Brings it to the front |
+
+cua-driver **0.36.0** (Codeg **0.37.0**) changed a few things by platform. On **Linux**, a screenshot no longer forces an agent to read the window again before it can click by reference. On **macOS**, a menu command reaches an app that isn't in front without bringing it forward — one the app disables in the background is refused — and a background drag now reaches sliders, canvases and selections, though not a drag-and-drop or an Electron app. Also on macOS, a line break or tab in typed text is pressed as Return or Tab rather than typed, so multi-line text can submit a form or send a chat.
 
 On Linux an action runs only while your session is active and unlocked with the screen saver off, and on Wayland keys can't be sent to a window brought to the front. On every platform a locked screen pauses it: an action then is refused as *paused* until you're back.
 

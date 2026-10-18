@@ -56,12 +56,14 @@ The desktop app stores the same kind of data in the same place, under an `app.co
 - **`uploads/`** — files uploaded as attachments in a browser or a remote-workspace window.
 - **`pets/`** — desktop-pet assets.
 - **`logs/`** — rotating daily log files (see [Logging](#logging)).
+- **`acp-transcripts/`** — the history Codeg records itself, for [custom agents](/guide/custom-agents#where-its-history-lives) and for ZCode, TRAE CLI and Command Code, one folder per agent.
+- **`mcp/`** — Codeg's own record of the [MCP servers](/guide/mcp) it hands ZCode.
 - **`tokens.json`** — the server's encrypted secret store (git credentials and the like). On the desktop these live in your OS keyring instead, so this file is server-only.
 
 To back up or migrate a deployment, copy this directory. (The in-app **backup** feature exports the same state as a portable `.codegbak` archive.)
 
 ::: warning Skills live outside the data directory
-Installed skills are kept under `~/.codeg/skills/`, which follows `CODEG_HOME` (default `~/.codeg`), **not** `CODEG_DATA_DIR`. If you relocate the data directory on a server, set `CODEG_HOME` too if you want skills to move with it. `CODEG_HOME` also takes precedence over `CODEG_DATA_DIR` for `uploads/`, `pets/`, and `logs/` when both are set.
+Installed skills are kept under `~/.codeg/skills/`, which follows `CODEG_HOME` (default `~/.codeg`), **not** `CODEG_DATA_DIR`. If you relocate the data directory on a server, set `CODEG_HOME` too if you want skills to move with it. `CODEG_HOME` also takes precedence over `CODEG_DATA_DIR` for `uploads/`, `pets/`, `logs/`, `acp-transcripts/` and `mcp/` when both are set.
 :::
 
 ## Storage limits

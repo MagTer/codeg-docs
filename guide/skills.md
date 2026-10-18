@@ -27,7 +27,7 @@ Open **Settings → Skill Packs**. It's a tabbed hub — **Experts**, **Science*
 
 ### The skill-and-agent matrix
 
-Each tab shows a grid: skills down the side (grouped by category), your agents across the top — every agent that actually reads skills from somewhere Codeg can write to. Tick a cell to enable that skill for that agent, untick to remove it. Everything is batchable:
+Each tab shows a grid: skills down the side (grouped by category), your agents across the top — every agent that actually reads skills from somewhere Codeg can write to. That's every built-in except ZCode, which keeps no skill folder Codeg could fill; Kiro CLI, TRAE CLI and Command Code, new to the grid in 0.36 and 0.37, each take `<id>/SKILL.md` folders only. Tick a cell to enable that skill for that agent, untick to remove it. Everything is batchable:
 
 - A skill's **⋯** menu enables or disables it across **every agent** at once.
 - An agent's column header does the reverse — **every skill** for one agent.
@@ -114,7 +114,7 @@ Save, and it lands right beside the pack-installed skills. From the list you can
 
 ## Invoke a skill in a conversation
 
-Enabled skills surface in the composer the moment you need them. Type **`/`** and they appear in the autocomplete right next to slash commands — pick one to drop it into your message. *(Codex uses **`$`** instead of `/`, matching its own convention.)* Since **0.35.0** a command that takes arguments shows what goes after it, as the agent describes it — Codex's `/review-branch` reads *branch name* — in that list, in the **+** menu's *Slash commands* and in the automation editor; picking it still inserts just the command. The **+** menu also carries shortcuts for the three skill families — Experts, Office, and Research — so you can reach a common skill without remembering its name.
+Enabled skills surface in the composer the moment you need them. Type **`/`** and they appear in the autocomplete right next to slash commands — pick one to drop it into your message. *(Codex uses **`$`** instead of `/`, matching its own convention.)* Most agents list their skills there themselves. For two, Codeg reads them from the folders Settings → Skills manages: Codex, in its `$` list, and since **0.36.0** Google Antigravity — which lists only a few commands of its own — after those commands in its `/` menu. A command whose name carries a colon, like Qoder's `/sites:sites-building`, reads as one command since **0.37.0** and reaches the agent exactly as named. Since **0.35.0** a command that takes arguments shows what goes after it, as the agent describes it — Codex's `/review-branch` reads *branch name* — in that list, in the **+** menu's *Slash commands* and in the automation editor; picking it still inserts just the command. The **+** menu also carries shortcuts for the three skill families — Experts, Office, and Research — so you can reach a common skill without remembering its name.
 
 Two things to know:
 

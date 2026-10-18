@@ -5,7 +5,7 @@ description: 用 Model Context Protocol 服务器为你的智能体提供额外�
 
 # MCP 服务器
 
-**Model Context Protocol（MCP）**是一项开放标准，用于向编码智能体交付额外的工具和数据——一个 GitHub 服务器、一个 Postgres 连接、一个无头浏览器、你公司的内部 API。Codeg 驱动的任何智能体都可以使用 MCP 服务器；问题在于，每一个智能体都用它*各自*的配置文件、各自的格式保存自己的 MCP 设置。Codeg 是统一管理它们的唯一入口：只需添加一次服务器，勾选哪些智能体应当拥有它，Codeg 就会替你把它写入它们各自的配置中。
+**Model Context Protocol（MCP）** 是一项开放标准，用于向编码智能体交付额外的工具和数据——一个 GitHub 服务器、一个 Postgres 连接、一个无头浏览器、你公司的内部 API。Codeg 驱动的任何智能体都可以使用 MCP 服务器；问题在于，每一个智能体都用它*各自*的配置文件、各自的格式保存自己的 MCP 设置。Codeg 是统一管理它们的唯一入口：只需添加一次服务器，勾选哪些智能体应当拥有它，Codeg 就会替你把它写入它们各自的配置中。
 
 Codeg 并不运行这些工具——MCP 是*智能体*的功能，服务器与智能体通信，而非与 Codeg 通信。Codeg 提供给你的是其上的管理层：对已安装内容的扫描、一个可搜索的、用于添加更多服务器的注册表，以及针对每个服务器的按智能体开关，这样你就再也无需为每个 CLI 手动编辑不同的文件。
 
@@ -80,15 +80,25 @@ DevTools 服务器驱动的是**另一个** Chrome，Codeg 管不到。你会拿
 | **Codex** | Codex 的 `config.toml`（`[mcp_servers.*]`） |
 | **Gemini** | `~/.gemini/settings.json` |
 | **OpenCode**、**Cline**、**Hermes**、**CodeBuddy**、**Kimi Code**、**Grok**、**Cursor** | 各智能体自己的 MCP 配置 |
+| **Qoder** | `~/.qoder/settings.json`（`mcpServers`） |
+| **Google Antigravity** | `<GEMINI_HOME>/config/mcp_config.json` |
+| **Kiro CLI** | `~/.kiro/settings/mcp.json`（`mcpServers`） |
+| **TRAE CLI** | `~/.trae/traecli.toml`（`[mcp_servers.*]`） |
+| **Command Code** | `~/.commandcode/mcp.json`（`mcpServers`） |
 | **DeepSeek Harness** | `$DSH_HOME/mcp.json`——Codeg 自己的记录，因为该智能体不读取任何属于自己的配置文件 |
+| **ZCode** | Codeg [数据目录](/zh/getting-started/configuration#where-codeg-stores-its-data)中的 `mcp/zcode.json`——Codeg 自己的记录，原因相同 |
 
 把服务器写入 JSON 配置时**会保留文件原有的键顺序**：自 **0.32.0** 起，文件的其余部分会保持你写下的顺序，而不是每次保存都被按字母顺序重新排列。
 
 只要有任何一个条目仍然指定了已退役的 `kaos` 执行器，**Kimi Code 2.2.0** 就会拒绝它的整个 `mcp.json`，所以自 **0.35.2** 起，Codeg 会从它保存的每个 Kimi 条目中去掉 `kaos`。Codeg 没有动过的条目则保持原样——如果升级之后 Kimi 不再加载你的服务器，请到那里找找有没有残留的 `kaos`。
 
-这就是**十五个智能体中的十三个**——除 **OpenClaw** 和 **Pi** 之外的每一个。OpenClaw 根本不接受 MCP 服务器（它是唯一选择不参与的智能体），因此不会作为目标提供；Pi 也不在列表中。→ [智能体之间有何不同](/zh/guide/supported-agents#how-agents-differ)
+这就是**十九个智能体中的十七个**——除 **OpenClaw** 和 **Pi** 之外的每一个。OpenClaw 根本不接受 MCP 服务器（它是唯一选择不参与的智能体），因此不会作为目标提供；Pi 也不在列表中。→ [智能体之间有何不同](/zh/guide/supported-agents#how-agents-differ)
 
-**DeepSeek** 在服务器*如何*到达它这件事上是个例外。其他每一个智能体都会在启动时读取自己的配置文件，因此 Codeg 写进去就可以撒手不管。而 `deepseek-acp` 桥接不读取任何配置文件——服务器只在创建会话时通过协议到达它——所以 `$DSH_HOME/mcp.json` 是 Codeg 关于「要发送什么」的记录，而不是智能体会去查阅的东西，真正的投送路径是 ACP 连接。一个实际影响：它只承载 **stdio 和 streamable HTTP** 服务器，而一个 **SSE** 条目会在你保存时就被拒绝，而不是等到启动时才失败。
+**DeepSeek** 和 **ZCode** 在服务器*如何*到达它们这件事上是例外。其他每一个智能体都会在启动时读取自己的配置文件，因此 Codeg 写进去就可以撒手不管。而它们的桥接不读取任何配置文件——服务器只在创建或恢复会话时通过协议到达它们——所以 `$DSH_HOME/mcp.json` 和 `mcp/zcode.json` 是 Codeg 关于「要发送什么」的记录，而不是智能体会去查阅的东西，真正的投送路径是 ACP 连接。
+
+**并非每个智能体都能承载每一种传输方式。** ZCode 只接受 **stdio** 服务器，而 Codex、DeepSeek Harness、Kiro CLI、TRAE CLI 和 Command Code 都不接受 **SSE** 服务器。保存时，无法承载该服务器传输方式的智能体会被直接略过——Codeg 之前以这个名字为它写入的任何内容也会被移除——因此只有当你勾选的智能体*没有一个*能承载它时，保存才会失败，而不是等到启动时才失败。
+
+**智能体自己的按服务器设置会被保留。** 有些智能体会在条目上保存一些 Codeg 编辑器不显示的额外字段。自 **0.37.0** 起，保存时会保留 **Cursor** 的这类字段——`envFile`、`auth`、`tls` 等——凡是你没有改动的字段都原样保留，而从市场重新安装某个服务器时，也会保留所有它没有设置的 Cursor 字段；SSE 服务器会保持为 SSE，不再变成 HTTP；这些 Cursor 独有的字段也不会再扩散到 Codeg 为其他智能体写入的配置里——对于 OpenClaw 和 pi 已经列着的服务器，它们的配置也算在内——以前 Cursor 的 `auth` 会因此让 OpenClaw 拒绝它的整个配置，让 pi 跳过这个服务器。**Kiro CLI** 的 `disabled`、`autoApprove`、`disabledTools`、`timeout` 和 `oauth` 设置，在你从编辑器保存时也会以同样的方式保留，因此你在 Kiro 中禁用的服务器会保持禁用。
 
 ::: info 自定义智能体不会列在这里
 这个页面的工作方式是往每个智能体**自己的**配置文件里写内容，而对于你自己注册的[自定义智能体](/zh/guide/custom-agents)，Codeg 刻意对它的配置文件一无所知——因此它们不会作为目标出现在这里。它们仍然能得到的是 Codeg 自己的伴随服务器，条件与任何内置智能体相同：只要它在[协作设置](/zh/reference/settings/collaboration)中的某项功能开启，它就会被挂上；而其中的[委派](/zh/guide/multi-agent)工具，要在委派本身启用后才会携带。若要给自定义智能体配置属于它自己的 MCP 服务器，请按该智能体原生的方式去配置。

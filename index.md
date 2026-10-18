@@ -9,7 +9,7 @@ hero:
 homeFeatures:
   - icon: 📥
     title: Conversation Aggregation
-    details: Import sessions from every supported agent into one unified, searchable workspace — one timeline no matter which tool produced them.
+    details: Import sessions from your agents' own histories into one unified, searchable workspace — one timeline no matter which tool produced them.
     link: /guide/aggregation
     linkText: Learn more
   - icon: 🤝

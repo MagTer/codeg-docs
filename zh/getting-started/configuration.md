@@ -56,12 +56,14 @@ Codeg 在两个地方进行配置。桌面应用和 Web 界面通过 **设置** 
 - **`uploads/`**——在浏览器或远程工作区窗口里作为附件上传的文件。
 - **`pets/`**——桌面宠物资源。
 - **`logs/`**——按天轮转的日志文件（参见[日志](#logging)）。
+- **`acp-transcripts/`**——Codeg 为[自定义智能体](/zh/guide/custom-agents#where-its-history-lives)以及 ZCode、TRAE CLI 和 Command Code 自行记录的历史，每个智能体一个文件夹。
+- **`mcp/`**——Codeg 自己记录的、它交给 ZCode 的那些 [MCP 服务器](/zh/guide/mcp)。
 - **`tokens.json`**——服务器的加密密钥存储（git 凭据之类）。在桌面端，这些内容改为存放在你的系统密钥环中，因此该文件仅存在于服务器上。
 
 要备份或迁移一个部署，复制此目录即可。（应用内的**备份**功能会将相同的状态导出为一个可移植的 `.codegbak` 归档文件。）
 
 ::: warning 技能存放在数据目录之外
-已安装的技能保存在 `~/.codeg/skills/` 下，它遵循 `CODEG_HOME`（默认 `~/.codeg`），而**不是** `CODEG_DATA_DIR`。如果你在服务器上重新定位了数据目录，并希望技能随之迁移，也请设置 `CODEG_HOME`。当两者都设置时，对于 `uploads/`、`pets/` 和 `logs/`，`CODEG_HOME` 也优先于 `CODEG_DATA_DIR`。
+已安装的技能保存在 `~/.codeg/skills/` 下，它遵循 `CODEG_HOME`（默认 `~/.codeg`），而**不是** `CODEG_DATA_DIR`。如果你在服务器上重新定位了数据目录，并希望技能随之迁移，也请设置 `CODEG_HOME`。当两者都设置时，对于 `uploads/`、`pets/`、`logs/`、`acp-transcripts/` 和 `mcp/`，`CODEG_HOME` 也优先于 `CODEG_DATA_DIR`。
 :::
 
 ## 存储限制 {#storage-limits}

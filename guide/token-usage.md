@@ -26,7 +26,7 @@ That sync is incremental: a conversation is re-parsed only when its record has m
 A few consequences worth knowing:
 
 - **The numbers are the agents' numbers.** Codeg is doing arithmetic, not metering — so what you see here is what your provider saw, subject to what the agent chose to report.
-- **An agent that records nothing contributes no tokens.** **Cursor** writes no token counts anywhere, so its sessions add nothing to the totals, the breakdowns, or the heaviest-sessions list — reporting a confident zero would be worse than reporting nothing. They do still count as **sessions**, since the headline session number follows your workspace list rather than the token table, which is what keeps it agreeing with the status bar. So if Cursor is a real part of your rotation, read the per-session averages knowing they're divided by sessions that couldn't contribute.
+- **An agent that records nothing contributes no tokens.** **Cursor** writes no token counts anywhere, and **Kiro CLI** records every counter as zero, so their sessions add nothing to the totals, the breakdowns, or the heaviest-sessions list — reporting a confident zero would be worse than reporting nothing. They do still count as **sessions**, since the headline session number follows your workspace list rather than the token table, which is what keeps it agreeing with the status bar. So if Cursor is a real part of your rotation, read the per-session averages knowing they're divided by sessions that couldn't contribute.
 - **The tokens are counted; the price is estimated.** Since **0.35.2** the page also says what the tokens would cost at the providers' API list prices — an estimate, labelled as one, and never your bill: what you actually pay depends on your plan. → [What it would cost at list price](#what-it-would-cost-at-list-price)
 - **Dimensions are read live.** Folder, agent and deletion state are joined from the conversation itself, so moving a folder or deleting a session lands in the report without a re-sync.
 - **Hermes reports per session, not per turn.** Its per-message rows carry no input/output split, so counting only per-turn usage would report those conversations as zero — a confident wrong number. Instead the session total is written as a single entry, filed at the session's last turn. Right for every total and breakdown; coarse only on the time axis.
@@ -114,11 +114,14 @@ The stored rows carry the version of the accounting that produced them. When a r
 - **Your usage stays local.** The facts live in Codeg's own database beside your conversations, computed from files already on your machine, and nothing about them is sent anywhere. The one request this page can make is for the public price list behind the estimate, and only when there's no cached copy less than a day old. → [Privacy & Security](/reference/privacy)
 - **The status bar is the only entry point.** There's no sidebar row for it — the counter you were already looking at is the button.
 - **A task costs a session.** Every [to-do](/guide/tasks) that runs is a full agent session with its own transcript, so four running at once show up here as four sessions' worth.
-- **Context usage is a different number.** The ring beside the composer tracks how full *this conversation's* context window is right now; this page is cumulative spend across everything. → [The Workspace](/guide/workspace#start-a-session-—-the-composer)
+- **Context usage is a different number.** The ring beside the composer tracks how full *this conversation's* context window is right now; this page is cumulative spend across everything. → [Conversations](/guide/conversations#start-a-session-—-the-composer)
+- **One conversation's totals are in its Session Details dialog** — open it from the conversation header's **⋮** menu. Since **0.37.0** the side panel's Session Details tab no longer shows them. → [The Side Panel](/guide/side-panel#session-details)
+- **Claude Code's prompt guesses aren't here.** With its adapter at 0.92.0 or later, Claude Code makes one more request after most turns to [suggest your next prompt](/guide/conversations#let-claude-code-suggest-the-next-prompt). It counts in your usage with the provider, but it never reaches the transcript this page reads.
 
 ## Next steps
 
-- [**The Workspace**](/guide/workspace) — the status bar this page opens from, and the per-conversation context ring.
+- [**The Workspace**](/guide/workspace) — the status bar this page opens from.
+- [**Conversations**](/guide/conversations#start-a-session-—-the-composer) — the per-conversation context ring beside the composer.
 - [**Conversation Aggregation**](/guide/aggregation) — how sessions you ran in an agent's own CLI get here in the first place.
 - [**Authentication & Models**](/guide/authentication) — the models the *by model* breakdown is naming.
 - [**Privacy & Security**](/reference/privacy) — what stays on your machine, this dashboard included.
