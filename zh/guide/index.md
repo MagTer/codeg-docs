@@ -1,6 +1,6 @@
 ---
 title: 指南
-description: 如何使用 Codeg——工作区、对话与右侧面板、git、画布、导入的历史与 Token 用量；智能体及其配置与登录；多智能体协作与助手；浏览器、电脑操作、MCP 与技能；聊天频道、自动化、待办任务与仓库面板；以及 Office、科学研究和项目工作流。
+description: 如何使用 Codeg——工作区、对话与智能体；协作、工具与技能；命令行、聊天频道、自动化和待办任务；以及 Office、科学研究和项目工作流。
 ---
 
 # 指南
@@ -55,6 +55,7 @@ Codeg 与具体智能体无关——用一致的界面驾驭十九个编码 CLI�
 
 无需坐在 Codeg 前也能驱动它。
 
+- [**命令行**](/zh/guide/command-line)——通过 `codeg-cli` 从终端运行智能体和助手，使用管道传入上下文，收集 JSON 结果，并在 CI 中使用 Codeg。
 - [**聊天频道**](/zh/guide/chat-channels)——连接 Telegram、Lark (Feishu) 和 iLink (Weixin)，即可创建任务、批准权限并获取实时更新——全部在你的聊天应用中完成。
 - [**自动化**](/zh/guide/automations)——将完整配置好的 composer 保存为可复用的自动化，并以无头方式按 cron 计划或按需运行。
 - [**待办任务**](/zh/guide/tasks)——把要做的事写下来，让智能体一件件做完，每个任务都在自己的 git worktree 中进行，在你验收之前不会合并任何东西。

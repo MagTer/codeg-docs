@@ -89,6 +89,7 @@ Codeg 读取你的智能体自己的会话存储，并将它们汇入一个统�
 
 Codeg 把智能体视为你可以*运行*的东西，而不仅仅是与之聊天的对象：
 
+- **[命令行](/zh/guide/command-line)**——通过 `codeg-cli` 从脚本或 CI 运行智能体和助手，支持并行运行、结构化结果，并能在 Codeg 中继续对话。
 - **[自动化](/zh/guide/automations)**——保存一套完整配置的设置，以无头方式按 cron 计划或按需运行。
 - **[待办任务](/zh/guide/tasks)**——把要做的事写下来，让智能体一件件做完，每个任务都在一份独立的代码副本中进行，且在你验收之前都不会合并。
 - **[仓库面板](/zh/guide/repository)**——把一个项目的 GitHub、GitLab 或 Gitea issue 与 pull request 列出来，把其中一条交给智能体——或者让面板自己把符合条件的接过去——再把结果作为 pull request 送回去。
@@ -115,7 +116,7 @@ Codeg 刻意不对你*应该*使用哪个智能体持有成见，并谨慎对待
 
 - **智能体无关。** 新智能体通过 ACP 接入，而非借助定制集成，因此工作区会随生态系统一同成长。
 - **本地优先。** 解析、存储和项目操作默认都在你的机器上进行；网络调用只会因你自己发起的事情而发生。参见[隐私与安全](/zh/reference/privacy)。
-- **一个内核，四个二进制文件。** 一个共享的 Rust 内核同时驱动桌面应用、独立服务器、MCP 伴生程序和电脑操作 helper；原生移动客户端则通过经过认证的 API 连接到这个内核。参见[架构](/zh/reference/architecture)。
+- **一个内核，五个二进制文件。** 一个共享的 Rust 内核驱动桌面应用、独立服务器、命令行客户端、MCP 伴生程序和电脑操作 helper；原生移动客户端则通过经过认证的 API 连接到这个内核。参见[架构](/zh/reference/architecture)。
 
 Codeg 站在开放工作的肩膀之上——用 [Agent Client Protocol](https://agentclientprotocol.com) 实现智能体连接，用 [Superpowers](https://github.com/obra/superpowers) 提供专家技能，用 [OfficeCLI](https://github.com/iOfficeAI/OfficeCLI) 处理文档，用 [scientific-agent-skills](https://github.com/K-Dense-AI/scientific-agent-skills) 支持科研。
 

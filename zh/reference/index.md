@@ -31,7 +31,7 @@ Codeg 将每一项偏好都汇集到同一个**设置**窗口中（其侧边栏�
 | **消息渠道** | 用于通知和远程控制的 IM 机器人 | [指南 → 聊天频道](/zh/guide/chat-channels) |
 | **Web 服务** | 将 Codeg 暴露给浏览器 —— 端口、令牌、二维码 *（仅桌面应用）* | [Web 服务](/zh/reference/settings/web-service) |
 | **运行日志** | 诊断日志 —— 级别、实时查看器、文件 | [运行日志](/zh/reference/settings/logs) |
-| **系统** | 更新、开机自启、网络代理、语言、配置同步、备份与恢复 | [系统](/zh/reference/settings/system) |
+| **系统** | 更新、开机自启、命令行访问、网络代理、语言、配置同步、备份与恢复 | [系统](/zh/reference/settings/system) |
 
 打开设置后，你会首先看到**外观**。无论你运行桌面应用还是通过浏览器访问 Codeg，每个界面都在 —— 只有一个例外，它在浏览器会话里会从导航中去掉：**Web 服务**，因为正是这个界面*开启*了浏览器访问。另有两个界面虽然也在，但内容更少。**浏览器操作**只保留在浏览器里仍然决定着某些事的那几行 —— 站点规则（用于阻止）、终端里起的服务要怎么处理，以及终端的链接菜单。**电脑操作**作用于服务器所在机器自己的桌面，而且只有当那台服务器以 `CODEG_COMPUTER_USE=1` 启动时才可用。
 
@@ -47,7 +47,7 @@ MCP、Skills、技能包、智能体、模型供应商和消息渠道是你要*�
 
 Codeg 是如何构建的，以及它如何处理你所交付的内容。
 
-- [**架构**](/zh/reference/architecture) —— 一个 Rust 核心，四个二进制文件：`codeg` 桌面应用、独立的 `codeg-server`、驱动委派与会话内工具的 `codeg-mcp` 伴生程序，以及支撑电脑操作的 `codeg-computer-helper`。各部分如何组合在一起，以及它们如何通过 ACP 驱动外部智能体 CLI。
+- [**架构**](/zh/reference/architecture) —— 一个 Rust 核心，五个二进制文件：`codeg` 桌面应用、`codeg-server` 独立服务器、`codeg-cli` 终端客户端、驱动委派与会话内工具的 `codeg-mcp` 伴生程序，以及支撑电脑操作的 `codeg-computer-helper`。各部分如何组合在一起，以及它们如何通过 ACP 驱动外部智能体 CLI。
 - [**隐私与安全**](/zh/reference/privacy) —— 哪些内容留在你的机器上、网络何时才真正被使用，以及智能体凭据和 Web 服务令牌如何被处理。
 
 ## 贡献 {#contributing}

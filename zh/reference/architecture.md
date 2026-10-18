@@ -1,32 +1,33 @@
 ---
 title: 架构
-description: 架构 —— Codeg 如何组合在一起，从它的单一 Rust 核心和共享 Web UI，到四个二进制文件以及它们通过 ACP 驱动的智能体 CLI。
+description: 架构 —— Codeg 如何组合在一起，从它的单一 Rust 核心和共享 Web UI，到五个二进制文件以及它们通过 ACP 驱动的智能体 CLI。
 ---
 
 # 架构
 
-在底层，Codeg 由为数不多、排布简单的组件构成：**一个 Rust 核心**、**一个 Web 前端**，以及由它们构建出的**四个二进制文件** —— 桌面应用、独立服务器、一个小巧的按智能体伴生程序，以及电脑操作所依托的 helper。会话所做的一切 —— 驱动智能体、打开终端、读取文件、向另一个智能体委派 —— 都流经这个共享核心。本页是地图；各个[设置界面](/zh/reference/)和[指南](/zh/guide/)才是实地。
+在底层，Codeg 由为数不多、排布简单的组件构成：**一个 Rust 核心**、**一个 Web 前端**，以及由它们构建出的**五个二进制文件** —— 桌面应用、独立服务器、命令行客户端、一个小巧的按智能体伴生程序，以及电脑操作所依托的 helper。会话所做的一切 —— 驱动智能体、打开终端、读取文件、向另一个智能体委派 —— 都流经这个共享核心。本页是地图；各个[设置界面](/zh/reference/)和[指南](/zh/guide/)才是实地。
 
-## 四个二进制文件 {#the-four-binaries}
+## 五个二进制文件 {#the-four-binaries}
 
-Codeg 从**单个 Cargo 工作区中交付四个 Rust 二进制文件**，它们全部由同一个库 crate（`codeg_lib`）编译而来：
+Codeg 从**单个 Cargo 工作区中交付五个 Rust 二进制文件**，它们全部由同一个库 crate（`codeg_lib`）编译而来：
 
 | 二进制文件 | 角色 |
 | ------ | ---- |
 | **`codeg`** | **桌面应用** —— 一个包裹着 Web UI 的 [Tauri](https://tauri.app/) 外壳（原生窗口、系统托盘、自动更新器）。 |
 | **`codeg-server`** | **独立服务器** —— 一个 HTTP + WebSocket 服务器，向浏览器提供相同的 UI，用于无头或共享部署。 |
+| **`codeg-cli`** | **命令行客户端**，0.38.0 新增——通过已有的桌面应用或服务器运行提示词并打印结果。→ [命令行](/zh/guide/command-line) |
 | **`codeg-mcp`** | **按次启动的伴生程序** —— 一个微型的 stdio [MCP](https://modelcontextprotocol.io/) 服务器，由智能体 CLI 运行，用于访问 Codeg 自身的工具：委派，以及会话内工具。 |
 | **`codeg-computer-helper`** | **电脑操作 helper** —— 真正读取并操作桌面窗口的那个进程，服务于桌面应用，或提供[电脑操作](/zh/guide/computer-use)的服务器。 |
 
-前两个是你*运行*的；另外两个则会为你自动启动 —— 伴生程序每个智能体会话一个（更多内容见[下文](#multi-agent-delegation-and-codeg-mcp)），helper 在电脑操作首次需要它时启动（见[下文](#computer-use-and-codeg-computer-helper)）。由于它们共享 `codeg_lib`，桌面应用和服务器是**同一产品的两道前门** —— 区别在于 UI 如何访问核心，而不是核心做什么。
+你运行桌面应用或服务器，也可以用 `codeg-cli` 从终端调用它们。伴生程序和 helper 则会为你自动启动 —— 伴生程序每个智能体会话一个（更多内容见[下文](#multi-agent-delegation-and-codeg-mcp)），helper 在电脑操作首次需要它时启动（见[下文](#computer-use-and-codeg-computer-helper)）。由于它们共享 `codeg_lib`，桌面应用和服务器是**同一产品的两道前门** —— 区别在于 UI 如何访问核心，而不是核心做什么。
 
-桌面应用随附的是放在它旁边的伴生程序和 helper，**不包括**服务器。在 **0.33.0** 之前，它一直带着一份从未用过的 `codeg-server` —— 约 70 MB —— 因为打包器会收走构建产出的每一个二进制文件；如今每个独立二进制文件都有了自己的构建特性，默认关闭，桌面构建就不会再顺带把它们产出来。→ [开发](/zh/reference/development)
+桌面应用随附 `codeg-cli`、伴生程序和 helper，**不包括**服务器。在 **0.33.0** 之前，它一直带着一份从未用过的 `codeg-server` —— 约 70 MB —— 因为打包器会收走构建产出的每一个二进制文件；如今每个独立二进制文件都有了自己的构建特性，默认关闭，桌面构建就不会再顺带把它们产出来。→ [开发](/zh/reference/development)
 
 ## 一个核心，一个前端 {#one-core-one-frontend}
 
-两个组件承担着真正的工作，且二者在每个二进制文件中都被复用：
+桌面应用和服务器共享两个主要组件：
 
-- **Rust 核心（`codeg_lib`）** —— 会话与智能体编排、数据库、git、凭据、Web 服务器、日志。它在 `codeg` 中开启 [Tauri](https://tauri.app/) 的桌面功能进行构建，而在其余三个中则以无头（无 GUI）方式编译。
+- **Rust 核心（`codeg_lib`）** —— 会话与智能体编排、数据库、git、凭据、Web 服务器、日志。它在 `codeg` 中开启 [Tauri](https://tauri.app/) 的桌面功能进行构建，而在其余四个中则以无头（无 GUI）方式编译。
 - **Web 前端** —— 一个 [Next.js](https://nextjs.org/) / React 应用，导出为静态文件。桌面应用在其 webview 中加载它们；服务器则将完全相同的产物提供给浏览器。
 
 将前端与核心连接起来的是一个**传输层**，它是"两道前门"设计的关键：同一份 UI 代码无论哪种方式都与核心通信，并在运行时选择自己的通道。
@@ -41,6 +42,10 @@ Codeg 从**单个 Cargo 工作区中交付四个 Rust 二进制文件**，它们
 [iOS 与 Android 应用](/zh/getting-started/installation#mobile-apps)在不移动核心的前提下增加了第三种客户端路径。它们是使用 SwiftUI 和 Jetpack Compose 构建的原生应用，而不是 Web 前端的外壳；两者都通过经过认证的 **HTTP + WebSocket API** 与桌面 Web 服务或 `codeg-server` 通信。访问令牌存放在 iOS Keychain 中，或由 Android Keystore 保护。
 
 手机上不会运行智能体 CLI，也不会放置项目检出。文件、数据库、git 操作和智能体子进程仍由主机持有；移动应用负责发送指令并渲染实时事件流。两个客户端均开放源码：[Codeg for iOS](https://github.com/xintaofei/codeg-ios) 与 [Codeg for Android](https://github.com/xintaofei/codeg-android)。
+
+## 命令行客户端 {#command-line-client}
+
+`codeg-cli` 是**运行中的** Codeg 的客户端。桌面应用和服务器各自提供一个仅监听本机回环地址的 CLI 监听器，通过 `<data dir>/cli/` 下的私有发现文件找到；远程命令则使用服务器以令牌认证的 HTTP API。共享核心负责创建对话、启动智能体，并应用本次运行的权限策略。CLI 跟随事件流，将结果输出为文本或 JSON。显式使用 `--standalone` 可为一条命令启动临时服务器，结束后将其停止。→ [命令行](/zh/guide/command-line)
 
 ## 智能体如何运行 {#how-agents-run}
 
@@ -83,7 +88,7 @@ Codeg 将其状态保存在**本地机器**上。它的[数据目录](/zh/gettin
 
 ## 值得了解 {#good-to-know}
 
-- **四个二进制文件，一套代码库。** `codeg`、`codeg-server`、`codeg-mcp` 和 `codeg-computer-helper` 是同一 Rust 工作区、同一 `codeg_lib` 核心之上的构建目标 —— 而不是需要保持同步的四个独立程序。
+- **五个二进制文件，一套代码库。** `codeg`、`codeg-server`、`codeg-cli`、`codeg-mcp` 和 `codeg-computer-helper` 是同一 Rust 工作区、同一 `codeg_lib` 核心之上的构建目标 —— 而不是需要保持同步的五个独立程序。
 - **桌面应用和服务器是同一个应用。** 区别在于传输方式（Tauri IPC 对 HTTP/WebSocket），而非功能集 —— [Web 服务](/zh/reference/settings/web-service)界面和[无头部署](/zh/getting-started/deployment)是访问同一份 UI 的两种途径。
 - **移动端是客户端，而不是另一套核心。** iOS 与 Android 通过经过认证的 API 连接；项目和智能体仍运行在桌面端或服务器主机上。
 - **智能体依旧是智能体。** Codeg 通过 ACP 编排官方 CLI；它不会 fork 或替换它们，因此每个智能体都保留自己的行为、认证和更新。

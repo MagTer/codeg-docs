@@ -19,6 +19,15 @@ Since **0.37.0** the side panel has an **Automations** tab too, listing the auto
 
 The first time in, there's nothing to show, so you land on a gallery of **templates** to start from.
 
+Since **0.38.0**, you can also list and trigger saved automations from a terminal with [`codeg-cli`](/guide/command-line#automations-and-ci):
+
+```bash
+codeg-cli automations
+codeg-cli automations run 3 --wait 30m
+```
+
+Without `--wait`, the command returns once the run starts. Waiting does not cancel a run; an **Enqueue task** automation finishes when its task is queued.
+
 ## Create one — from a template or from scratch
 
 Hit **New automation** and either pick a template or start blank. Codeg ships seven templates, each a ready-to-edit starting prompt:

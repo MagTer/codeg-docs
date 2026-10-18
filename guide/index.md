@@ -1,6 +1,6 @@
 ---
 title: Guide
-description: How to use Codeg — the workspace, conversations and the side panel, git, canvases, imported history and token usage; agents, their setup and sign-in; multi-agent collaboration and assistants; the browser, computer use, MCP and skills; chat channels, automations, to-dos and the repository panel; and the office, research and project workflows.
+description: How to use Codeg — the workspace, conversations and agents; collaboration, tools and skills; the command line, chat channels, automations and to-dos; and office, research and project workflows.
 ---
 
 # Guide
@@ -55,6 +55,7 @@ Give your agents more to work with.
 
 Drive Codeg without sitting in front of it.
 
+- [**Command Line**](/guide/command-line) — run agents and assistants from a terminal with `codeg-cli`, pipe context, collect JSON results, and use Codeg in CI.
 - [**Chat Channels**](/guide/chat-channels) — connect Telegram, Lark (Feishu), and iLink (Weixin) to create tasks, approve permissions, and get live updates — all from your chat app.
 - [**Automations**](/guide/automations) — save a fully-configured composer as a reusable automation and run it headlessly, on a cron schedule or on demand.
 - [**To-dos**](/guide/tasks) — write down what needs doing and let agents work through the list, each in its own git worktree, waiting for your review before anything merges.

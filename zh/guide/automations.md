@@ -19,6 +19,15 @@ description: 只需保存一次智能体任务，就让 Codeg 替你运行它—
 
 第一次进入时没有任何内容可显示，因此你会来到一个可供起步的**模板**库。
 
+从 **0.38.0** 起，你还可以在终端中通过 [`codeg-cli`](/zh/guide/command-line#automations-and-ci) 列出并触发已保存的自动化：
+
+```bash
+codeg-cli automations
+codeg-cli automations run 3 --wait 30m
+```
+
+不加 `--wait` 时，命令在运行启动后即返回。停止等待不会取消运行；**排入任务**类型的自动化在任务入队时即完成。
+
 ## 创建一个——从模板或从零开始 {#create-one-—-from-a-template-or-from-scratch}
 
 点击**新建自动化**，然后要么选择一个模板，要么从空白开始。Codeg 附带七个模板，每个都是一段可直接编辑的起始提示词：

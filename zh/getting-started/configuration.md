@@ -58,6 +58,7 @@ Codeg 在两个地方进行配置。桌面应用和 Web 界面通过 **设置** 
 - **`logs/`**——按天轮转的日志文件（参见[日志](#logging)）。
 - **`acp-transcripts/`**——Codeg 为[自定义智能体](/zh/guide/custom-agents#where-its-history-lives)以及 ZCode、TRAE CLI 和 Command Code 自行记录的历史，每个智能体一个文件夹。
 - **`mcp/`**——Codeg 自己记录的、它交给 ZCode 的那些 [MCP 服务器](/zh/guide/mcp)。
+- **`cli/`**——[命令行访问](/zh/guide/command-line)的私有发现文件，由各个运行中的实例创建；它们是发现凭据，不是供你编辑的配置文件。
 - **`tokens.json`**——服务器的加密密钥存储（git 凭据之类）。在桌面端，这些内容改为存放在你的系统密钥环中，因此该文件仅存在于服务器上。
 
 要备份或迁移一个部署，复制此目录即可。（应用内的**备份**功能会将相同的状态导出为一个可移植的 `.codegbak` 归档文件。）
@@ -65,6 +66,20 @@ Codeg 在两个地方进行配置。桌面应用和 Web 界面通过 **设置** 
 ::: warning 技能存放在数据目录之外
 已安装的技能保存在 `~/.codeg/skills/` 下，它遵循 `CODEG_HOME`（默认 `~/.codeg`），而**不是** `CODEG_DATA_DIR`。如果你在服务器上重新定位了数据目录，并希望技能随之迁移，也请设置 `CODEG_HOME`。当两者都设置时，对于 `uploads/`、`pets/`、`logs/`、`acp-transcripts/` 和 `mcp/`，`CODEG_HOME` 也优先于 `CODEG_DATA_DIR`。
 :::
+
+## 命令行环境变量 {#command-line-environment}
+
+从 **0.38.0** 起，[`codeg-cli`](/zh/guide/command-line) 可通过环境变量选择运行中的 Codeg。这些变量与命令行选项一起配置的是**客户端**：
+
+| 变量 | 用途 |
+| -------- | ------- |
+| `CODEG_URL` | HTTP(S) Codeg 地址，与 `CODEG_TOKEN` 配合使用。 |
+| `CODEG_TOKEN` | 服务器访问令牌；使用 `--url` 却未提供令牌选项时也会读取它。 |
+| `CODEG_DATA_DIR` | 在该数据目录中发现本地 Codeg。 |
+| `CODEG_CLI_ENDPOINT_FILE` | 某个实例的发现文件。由 Codeg 在自己的终端和智能体进程中设置。 |
+| `CODEG_CLI` | Codeg 在这些进程中提供的 CLI 完整路径。若 shell 调整了 PATH，可调用 `"$CODEG_CLI"`。 |
+
+选择顺序是 **`--url` → `--data-dir` → `CODEG_CLI_ENDPOINT_FILE` → `CODEG_URL` → `CODEG_DATA_DIR` → 默认目录**。显式目标连接失败后，不会改选其他实例。只有指定 `--standalone` 时才会启动临时服务器。参见[实例选择](/zh/guide/command-line#choose-which-codeg-to-use)和[命令行访问设置](/zh/reference/settings/system#command-line-access)。
 
 ## 存储限制 {#storage-limits}
 

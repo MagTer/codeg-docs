@@ -58,6 +58,7 @@ The desktop app stores the same kind of data in the same place, under an `app.co
 - **`logs/`** — rotating daily log files (see [Logging](#logging)).
 - **`acp-transcripts/`** — the history Codeg records itself, for [custom agents](/guide/custom-agents#where-its-history-lives) and for ZCode, TRAE CLI and Command Code, one folder per agent.
 - **`mcp/`** — Codeg's own record of the [MCP servers](/guide/mcp) it hands ZCode.
+- **`cli/`** — private endpoint files for [command-line access](/guide/command-line), created by each running instance; these are discovery credentials, not configuration files to edit.
 - **`tokens.json`** — the server's encrypted secret store (git credentials and the like). On the desktop these live in your OS keyring instead, so this file is server-only.
 
 To back up or migrate a deployment, copy this directory. (The in-app **backup** feature exports the same state as a portable `.codegbak` archive.)
@@ -65,6 +66,20 @@ To back up or migrate a deployment, copy this directory. (The in-app **backup** 
 ::: warning Skills live outside the data directory
 Installed skills are kept under `~/.codeg/skills/`, which follows `CODEG_HOME` (default `~/.codeg`), **not** `CODEG_DATA_DIR`. If you relocate the data directory on a server, set `CODEG_HOME` too if you want skills to move with it. `CODEG_HOME` also takes precedence over `CODEG_DATA_DIR` for `uploads/`, `pets/`, `logs/`, `acp-transcripts/` and `mcp/` when both are set.
 :::
+
+## Command-line environment {#command-line-environment}
+
+Since **0.38.0**, [`codeg-cli`](/guide/command-line) can use environment variables to select a running Codeg. These configure the **client**, alongside its command-line options:
+
+| Variable | Purpose |
+| -------- | ------- |
+| `CODEG_URL` | HTTP(S) Codeg endpoint, used with `CODEG_TOKEN`. |
+| `CODEG_TOKEN` | The server's access token; also the fallback token for `--url` when no token option is supplied. |
+| `CODEG_DATA_DIR` | Discover a local Codeg using this data directory. |
+| `CODEG_CLI_ENDPOINT_FILE` | A specific instance's discovery file. Set by Codeg in its own terminals and agent processes. |
+| `CODEG_CLI` | Full path to the CLI supplied by Codeg in those processes. Invoke `"$CODEG_CLI"` if your shell has changed PATH. |
+
+Selection order is **`--url` → `--data-dir` → `CODEG_CLI_ENDPOINT_FILE` → `CODEG_URL` → `CODEG_DATA_DIR` → default directories**. An explicit target that fails is not replaced by another instance. `--standalone` starts a temporary server only when requested. See [runtime selection](/guide/command-line#choose-which-codeg-to-use) and the [Command-line access setting](/reference/settings/system#command-line-access).
 
 ## Storage limits
 

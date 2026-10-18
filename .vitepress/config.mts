@@ -160,6 +160,7 @@ export default defineConfig({
             {
               text: 'Channels & Automation',
               items: [
+                { text: 'Command Line', link: '/guide/command-line' },
                 { text: 'Chat Channels', link: '/guide/chat-channels' },
                 { text: 'Automations', link: '/guide/automations' },
                 { text: 'To-dos', link: '/guide/tasks' },
@@ -286,6 +287,7 @@ export default defineConfig({
             {
               text: '频道与自动化',
               items: [
+                { text: '命令行', link: '/zh/guide/command-line' },
                 { text: '聊天频道', link: '/zh/guide/chat-channels' },
                 { text: '自动化', link: '/zh/guide/automations' },
                 { text: '待办任务', link: '/zh/guide/tasks' },

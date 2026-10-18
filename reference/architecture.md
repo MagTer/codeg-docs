@@ -1,32 +1,33 @@
 ---
 title: Architecture
-description: Architecture — how Codeg fits together, from its one Rust core and shared web UI to the four binaries and the agent CLIs they drive over ACP.
+description: Architecture — how Codeg fits together, from its one Rust core and shared web UI to the five binaries and the agent CLIs they drive over ACP.
 ---
 
 # Architecture
 
-Underneath, Codeg is a small number of moving parts arranged simply: **one Rust core**, **one web frontend**, and **four binaries** built from them — the desktop app, the standalone server, a small per-agent companion, and the helper that computer use runs through. Everything a session does — driving an agent, opening a terminal, reading a file, delegating to another agent — flows through that shared core. This page is the map; the individual [Settings screens](/reference/) and [guides](/guide/) are the territory.
+Underneath, Codeg is a small number of moving parts arranged simply: **one Rust core**, **one web frontend**, and **five binaries** built from them — the desktop app, the standalone server, the command-line client, a small per-agent companion, and the helper that computer use runs through. Everything a session does — driving an agent, opening a terminal, reading a file, delegating to another agent — flows through that shared core. This page is the map; the individual [Settings screens](/reference/) and [guides](/guide/) are the territory.
 
-## The four binaries {#the-four-binaries}
+## The five binaries {#the-four-binaries}
 
-Codeg ships **four Rust binaries from a single Cargo workspace**, all compiled from the same library crate (`codeg_lib`):
+Codeg ships **five Rust binaries from a single Cargo workspace**, all compiled from the same library crate (`codeg_lib`):
 
 | Binary | Role |
 | ------ | ---- |
 | **`codeg`** | The **desktop app** — a [Tauri](https://tauri.app/) shell (native window, system tray, auto-updater) wrapping the web UI. |
 | **`codeg-server`** | The **standalone server** — an HTTP + WebSocket server that serves the same UI to a browser, for headless or shared deployments. |
+| **`codeg-cli`** | The **command-line client**, added in 0.38.0 — runs prompts through an existing desktop app or server and prints the result. → [Command Line](/guide/command-line) |
 | **`codeg-mcp`** | The **per-launch companion** — a tiny stdio [MCP](https://modelcontextprotocol.io/) server an agent CLI runs to reach Codeg's own tools: delegation, and the in-conversation tools. |
 | **`codeg-computer-helper`** | The **computer-use helper** — the process that actually reads and acts on desktop windows, for the desktop app or a server that offers [computer use](/guide/computer-use). |
 
-The first two are the ones you *run*; the other two are started for you — the companion once per agent session (more on it [below](#multi-agent-delegation-and-codeg-mcp)), the helper the first time computer use needs it ([below](#computer-use-and-codeg-computer-helper)). Because they share `codeg_lib`, the desktop app and the server are the **same product with two front doors** — the difference is how the UI reaches the core, not what the core does.
+You run the desktop app or server, and optionally `codeg-cli` to call one from a terminal. The companion and helper are started for you — the companion once per agent session (more on it [below](#multi-agent-delegation-and-codeg-mcp)), the helper the first time computer use needs it ([below](#computer-use-and-codeg-computer-helper)). Because they share `codeg_lib`, the desktop app and the server are the **same product with two front doors** — the difference is how the UI reaches the core, not what the core does.
 
-The desktop app ships with the companion and the helper beside it, and **not** with the server. Until **0.33.0** it carried a copy of `codeg-server` it never used — about 70 MB — because the bundler takes every binary the build produces; each standalone binary now has a build feature of its own, off by default, so the desktop build doesn't produce them by accident. → [Development](/reference/development)
+The desktop app ships with `codeg-cli`, the companion, and the helper, and **not** with the server. Until **0.33.0** it carried a copy of `codeg-server` it never used — about 70 MB — because the bundler takes every binary the build produces; each standalone binary now has a build feature of its own, off by default, so the desktop build doesn't produce them by accident. → [Development](/reference/development)
 
 ## One core, one frontend
 
-Two pieces do the real work, and both are reused across every binary:
+The desktop app and server share two main pieces:
 
-- **The Rust core (`codeg_lib`)** — session and agent orchestration, the database, git, credentials, the web server, logging. It's built with [Tauri](https://tauri.app/)'s desktop features on for `codeg`, and compiled headless (no GUI) for the other three.
+- **The Rust core (`codeg_lib`)** — session and agent orchestration, the database, git, credentials, the web server, logging. It's built with [Tauri](https://tauri.app/)'s desktop features on for `codeg`, and compiled headless (no GUI) for the other four.
 - **The web frontend** — a [Next.js](https://nextjs.org/) / React app, exported as static files. The desktop app loads them in its webview; the server serves the very same bundle to browsers.
 
 What connects the frontend to the core is a **transport layer**, and it's the key to the two-front-doors design: the same UI code talks to the core either way, choosing its channel at runtime.
@@ -41,6 +42,10 @@ This is why the [Web Service](/reference/settings/web-service) screen can hand y
 The [iOS and Android apps](/getting-started/installation#mobile-apps) add a third client path without moving the core. They are native SwiftUI and Jetpack Compose applications rather than wrappers around the web frontend, and they talk to a desktop Web Service or `codeg-server` through the same authenticated **HTTP + WebSocket API**. The access token is kept in iOS Keychain or protected by Android Keystore.
 
 No agent CLI or project checkout runs on the phone. The host still owns the files, database, git operations, and agent subprocesses; the mobile app sends commands and renders the resulting live event stream. Both clients are open source: [Codeg for iOS](https://github.com/xintaofei/codeg-ios) and [Codeg for Android](https://github.com/xintaofei/codeg-android).
+
+## Command-line client {#command-line-client}
+
+`codeg-cli` is a client of a **running** Codeg, not another agent runtime. The desktop app and server each expose a loopback-only CLI listener, discovered through a private endpoint file under `<data dir>/cli/`; a remote command uses the server's token-authenticated HTTP API instead. The shared core creates the conversation, launches the agent, and applies the run's permission policy. The CLI follows its events and prints the result as text or JSON. `--standalone` explicitly starts a temporary server for a command, then stops it afterwards. → [Command Line](/guide/command-line)
 
 ## How agents run
 
@@ -83,7 +88,7 @@ There's no Codeg cloud in the middle. The desktop app and a server you run both 
 
 ## Good to know
 
-- **Four binaries, one codebase.** `codeg`, `codeg-server`, `codeg-mcp` and `codeg-computer-helper` are build targets of the same Rust workspace over the same `codeg_lib` core — not four separate programs to keep in sync.
+- **Five binaries, one codebase.** `codeg`, `codeg-server`, `codeg-cli`, `codeg-mcp` and `codeg-computer-helper` are build targets of the same Rust workspace over the same `codeg_lib` core — not five separate programs to keep in sync.
 - **Desktop and server are the same app.** The distinction is the transport (Tauri IPC vs HTTP/WebSocket), not the feature set — the [Web Service](/reference/settings/web-service) screen and a [headless deployment](/getting-started/deployment) are two ways to reach the identical UI.
 - **Mobile is a client, not another core.** iOS and Android connect over the authenticated API; projects and agents keep running on the desktop or server host.
 - **Agents stay agents.** Codeg orchestrates the official CLIs over ACP; it doesn't fork or replace them, so each keeps its own behavior, auth, and updates.

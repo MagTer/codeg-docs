@@ -22,6 +22,8 @@ description: 使用 codeg-server 或 Docker 在 Linux 或 macOS 服务器上以�
 
 每种方式都会安装 `codeg-server` 及其 `codeg-mcp` 伴生程序，因此多智能体委派在服务器上的运作方式与桌面端完全一致。自 **0.33.0** 起，安装脚本和发布压缩包还会附带 `codeg-computer-helper`，供要在自己桌面上提供[电脑操作](/zh/guide/computer-use)的服务器使用；Docker 镜像则不带。
 
+从 **0.38.0** 起，安装包和 Docker 镜像还包含 **`codeg-cli`**，用于从终端或 CI 任务运行智能体和助手。→ [命令行](/zh/guide/command-line)
+
 ## Docker {#docker}
 
 最快的持久化部署只需一条命令：
@@ -40,7 +42,7 @@ docker run -d -p 3080:3080 \
   ghcr.io/spacering-net/codeg:latest
 ```
 
-镜像以多架构（amd64 + arm64）形式发布到 `ghcr.io/spacering-net/codeg` 和 Docker Hub 上的 `xintaofei/codeg`，并以每个版本的版本号作为标签（`:0.37.0`）。`:latest` 只跟随**稳定**版本——候选发布版有自己的版本标签，以 `-rc.N` 结尾，且永远不会移动 `latest`。
+镜像以多架构（amd64 + arm64）形式发布到 `ghcr.io/spacering-net/codeg` 和 Docker Hub 上的 `xintaofei/codeg`，并以每个版本的版本号作为标签（`:0.38.0`）。`:latest` 只跟随**稳定**版本——候选发布版有自己的版本标签，以 `-rc.N` 结尾，且永远不会移动 `latest`。
 
 ::: warning 还在从 `ghcr.io/xintaofei/codeg` 拉取？请换成新名称
 Codeg 的仓库已迁到 `spacering-net/codeg`，自 **0.34.0** 起，GitHub 的镜像仓库改用新名称发布。**`ghcr.io/xintaofei/codeg` 停在 0.33.0**——仍写着它的容器或 Compose 文件会一直拉取那个版本，再也不会更新。把镜像改成 `ghcr.io/spacering-net/codeg` 即可；`codeg-data` 卷与镜像名称无关，数据会一并带过去。Docker Hub 上的 `xintaofei/codeg` 照常更新。
@@ -85,10 +87,10 @@ volumes:
 curl -fsSL https://raw.githubusercontent.com/spacering-net/codeg/main/install.sh | bash
 ```
 
-这会将 `codeg-server` 和 `codeg-mcp` 放入 `/usr/local/bin`，并将捆绑的 Web 资源放入 `/usr/local/share/codeg/web`，仅在目标位置尚不可写时才使用 `sudo`。用 `--version` / `--dir` 来固定版本或更改位置：
+这会将 `codeg-server`、`codeg-mcp`、`codeg-computer-helper` 和 `codeg-cli` 放入 `/usr/local/bin`，并将捆绑的 Web 资源放入 `/usr/local/share/codeg/web`，仅在目标位置尚不可写时才使用 `sudo`。用 `--version` / `--dir` 来固定版本或更改位置：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/spacering-net/codeg/main/install.sh | bash -s -- --version v0.26.0 --dir ~/.local/bin
+curl -fsSL https://raw.githubusercontent.com/spacering-net/codeg/main/install.sh | bash -s -- --version v0.38.0 --dir ~/.local/bin
 ```
 
 然后启动它。安装程序会为你打印出确切的命令；在无人值守的主机上添加 `--supervise`，这样失败的自我升级就会自动回滚：
@@ -111,7 +113,7 @@ irm https://raw.githubusercontent.com/spacering-net/codeg/main/install.ps1 | iex
 $env:CODEG_STATIC_DIR="$env:LOCALAPPDATA\codeg-server\web"; codeg-server
 ```
 
-用 `.\install.ps1 -Version v0.26.0` 固定版本，或用 `-InstallDir` 选择安装文件夹。Windows 上禁用了自我更新——请通过重新运行安装程序来升级。
+用 `.\install.ps1 -Version v0.38.0` 固定版本，或用 `-InstallDir` 选择安装文件夹。Windows 上禁用了自我更新——请通过重新运行安装程序来升级。
 
 ::: info 自 0.33.0 起，服务器有了自己的文件夹
 它以前安装在 `%LOCALAPPDATA%\codeg`——也就是**桌面应用的**文件夹——两者在那里可能互相覆盖对方的文件、终止对方的进程。重新运行脚本时，如果发现服务器与桌面应用共用那个文件夹，脚本会把服务器迁到 `codeg-server`，只带走 `codeg-server.exe` 及其 PATH 条目，桌面应用的文件一概不动；独占旧文件夹的服务器则留在原处。脚本会拒绝任何装有桌面应用的目标位置，而从桌面应用文件夹启动的服务器会在启动时警告它应该搬走。如果有服务、计划任务或快捷方式仍在启动旧的那一份，或者 `CODEG_STATIC_DIR` 仍指向 `%LOCALAPPDATA%\codeg\web`，请把它们改为指向新文件夹。
@@ -144,6 +146,7 @@ pnpm install && pnpm build          # build the web UI
 cd src-tauri
 cargo build --release --bin codeg-server --no-default-features --features server-bin
 cargo build --release --bin codeg-mcp --no-default-features --features mcp-bin   # delegation companion
+cargo build --release --bin codeg-cli --no-default-features --features cli-bin   # command-line client
 CODEG_STATIC_DIR=../out ./target/release/codeg-server
 ```
 
@@ -208,11 +211,15 @@ CODEG_STATIC_DIR=../out ./target/release/codeg-server
 - **每个版本一份。** 新版本会装上一份新副本，并清掉更早的那些，只留下上一个版本的文件。如果安装无法完成——比如位于一个会把这次请求重定向走的登录代理之后——那就只是没有副本而已，其他一切照旧。
 - **页面仍然先找服务器要。** 只有服务器答不了时——完全连不上，或者服务器出错——页面加载才会用这份副本，所以跳转到登录页的重定向，或服务器实际给出的任何其他答复，都照常通过。构建文件本身在一个版本内不会变，直接从副本里取。
 
-Codeg 没有为它提供开关；要移除这份副本，请在浏览器里清除该站点的数据。
+**服务器升级或回滚后**，已打开的标签页可能仍在运行旧版界面。从 **0.38.0** 起，Codeg 会在页面加载和重新连接后检查服务器版本。不一致时，会显示持续保留的提示，列出两个版本，并提供**刷新**按钮。由当前页面发起的应用内升级或回滚会自行刷新。新加载的页面会向服务器重新验证文件；带内容哈希的构建资源仍可缓存。
+
+Codeg 没有为浏览器缓存提供开关；要移除这份副本，请在浏览器里清除该站点的数据。
 
 ## 保持服务器更新 {#keep-your-server-up-to-date}
 
 与桌面应用一样，`codeg-server` 也可从**设置 → 软件更新**自我更新：它会下载适用于其平台的、经过签名的版本，验证签名（自 **0.36.0** 起，签名必须写明的恰好是所提供的那个版本，这样一个较旧的已签名压缩包就没法冒充成较新的版本），替换磁盘上的二进制文件和 Web 资源，然后重启——无需重新部署。上一个版本会被保留，因此同一界面上还提供了**回滚**。此功能仅限 Linux/macOS（Windows 上已禁用）。自 **0.32.1** 起，无法写入自身安装位置的服务器——比如二进制文件或 Web 文件夹不归它所有、磁盘已满——会在你尝试**之前**就在该界面上说明这一点，并改为提供发布页面，供你手动更新。
+
+**从 0.37.0 更新不会安装 `codeg-cli`。** 请从新版本的服务器压缩包中提取，并放到 `codeg-server` 旁边。**从 0.38.0 及之后的版本发起**的更新会同时更新匹配的 CLI。服务器重启会结束正在进行的 CLI 运行，因此请先让重要工作完成再升级。
 
 在其监督进程下运行它，以确保升级安全：
 

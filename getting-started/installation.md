@@ -86,6 +86,7 @@ Three steps take you from a fresh install to a running session:
 
 ## Other ways to connect
 
+- **Use Codeg from a terminal or CI job** — `codeg-cli`, bundled since **0.38.0**, runs agents and assistants through your desktop app or server and saves each run as a conversation. → [Command Line](/guide/command-line)
 - **Use your desktop app from any browser** — enable **Settings → Web Service** and Codeg serves its interface over the network, protected by an access token (with a QR code for phones). Because it listens on all network interfaces, you can reach your desktop session from any device that can connect to your machine — no separate server required. → [Web Service](/reference/settings/web-service)
 - **Run it on a dedicated server** — for headless or team use, deploy `codeg-server` and use Codeg from any browser. → [Deployment](/getting-started/deployment)
 - **Build from source** — see the [Development](/reference/development) guide.

@@ -1,11 +1,11 @@
 ---
 title: System
-description: The System settings screen — Codeg's operations hub for software updates, launching at login, the network proxy, the app language, configuration sync between machines, and full backup and restore.
+description: Configure software updates, launch at login, command-line access, the network proxy, language, configuration sync, and backup and restore.
 ---
 
 # System
 
-**Settings → System** — labeled **System Management** in the app — is the operations screen: *"Manage app updates, launch at login, network proxy and language preferences,"* plus a fifth for syncing your settings between machines and for backing up and restoring everything. Five independent sections, each saving on its own; nothing here needs a page-level Save.
+**Settings → System** — labeled **System Management** in the app — manages software updates, launch at login, command-line access, the network proxy, language, and data sync and backups. Each section saves independently; there is no page-level Save.
 
 ## Software Update
 
@@ -25,6 +25,8 @@ What the upgrade button does depends on where you're running — this is the one
 
 **A package must be signed for the version on offer.** Since **0.36.0**, in the desktop app and the server's online upgrade alike, Codeg installs an update only if its signature names the very version the release announced — so an older signed package can't be passed off as a newer one. A package that fails this check shows as a plain *Failed to install update*.
 
+**0.38.0** also fixes two restart problems: on macOS, relaunch waits for the old instance to exit so the Dock keeps one icon; on Windows, the installer stops bundled helper processes through the Windows API, avoiding the WMI query that could leave an update hanging.
+
 ::: info Rollback (server only)
 A self-updating server keeps the previous binary, so after an upgrade a **Roll back** button appears — *"Restore the version installed before the last upgrade."* It's there for a regression that only surfaces later, once the automatic trial-window check has already passed. The desktop app updates through the OS installer and doesn't offer this. On **Docker**, an in-place upgrade is only live until the container is recreated — *"to keep it, pull or build an image at the new version and recreate."*
 :::
@@ -40,6 +42,16 @@ One switch, added in **0.27**: *"Opens automatically after you sign in to this c
 Codeg keeps **no copy of this setting** — the operating system's own startup entry is the only record, and the switch reads back from it. That matters in one specific way: what the toggle shows afterwards is **what the system actually settled on**, not what you asked for. If something outside Codeg vetoes the entry — Windows Task Manager's startup tab is the usual culprit — the switch flips back to off rather than claiming a state the machine disagrees with. If the entry can't be read at all, the panel says so instead of guessing.
 
 On **macOS**, a Codeg that opened at login may not come back by itself after an update that was started from **0.35.2 or earlier** — click its Dock icon to open it. Updates started from 0.36.0 on relaunch normally.
+
+## Command-line access {#command-line-access}
+
+Added in **0.38.0**, **Command-line access** lets the **`codeg-cli`** command on this computer run prompts through this Codeg. It is **on by default**. The card shows the private **Endpoint file** used to discover this instance and a **Try** command. If the listener cannot start, it shows the reason instead.
+
+Switching it off stops the local listener and removes its endpoint file immediately. It does **not** disable a server's authenticated HTTP API: `codeg-cli --url …` with the server's token still works. The listener's key is generated on every launch and kept in an owner-private file; programs running as your OS user can use it. → [Privacy & Security](/reference/privacy#command-line-access)
+
+In the **local desktop app**, **Install command-line tool** puts the bundled command on PATH: a link in `/usr/local/bin` on macOS, the installer's `bin` folder added to the user's PATH on Windows, or a link in `~/.local/bin` for an AppImage. Linux `.deb` and `.rpm` packages already provide it. A command from another installation is left alone, and the card explains a conflict if there is one. Open a new terminal after installing on Windows. Browser and remote-workspace sessions do not offer this local installation button.
+
+See [Command Line](/guide/command-line) for installation, runtime selection, permission policies, structured output, and CI.
 
 ## Network Proxy
 
@@ -67,7 +79,7 @@ Sets the language of Codeg's **own interface** — menus, buttons, settings. **A
 
 ## Data & sync {#backup-restore}
 
-The fifth card — *"Configuration sync carries your settings between machines; backup packs up all of this machine's codeg data."* Three tabs, opening on the first: **Configuration sync**, **Backup** and **Restore**.
+*"Configuration sync carries your settings between machines; backup packs up all of this machine's codeg data."* Three tabs, opening on the first: **Configuration sync**, **Backup** and **Restore**.
 
 ### Configuration sync {#configuration-sync}
 
@@ -140,7 +152,7 @@ Backup and restore operate on the data of the machine actually running Codeg. If
 
 ## Good to know
 
-- **Five panels, saved independently.** The proxy, the language, launch at login, the update check and Data & sync each act on their own — the WebDAV settings with a **Save** of their own; there's no page-level Save, and changing one never touches another.
+- **Settings save independently.** Command-line access, the proxy, language, launch at login, updates, and Data & sync each act on their own — the WebDAV settings have a **Save** of their own; there's no page-level Save.
 - **Launch at login has no stored copy.** The OS entry is the setting, so the switch shows what your machine actually agreed to.
 - **Desktop and server update differently.** The desktop app auto-installs and relaunches; a server updates in place with a restart (and can roll back); an old remote server just links you to the release. Same panel, three behaviors.
 - **An unencrypted backup is plaintext secrets** — and so is every configuration export. API keys and tokens ride along in the clear unless you set a passphrase on a backup or switch on **Encrypt the snapshot** for WebDAV; an exported configuration file is never encrypted, so keep it somewhere trusted. How Codeg handles secrets generally is under [Privacy & Security](/reference/privacy).

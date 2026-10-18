@@ -86,6 +86,7 @@ Codeg 的界面运行在 **WebKitGTK** 运行时（`libwebkit2gtk-4.1`）之上�
 
 ## 其他连接方式 {#other-ways-to-connect}
 
+- **从终端或 CI 任务使用 Codeg**——自 **0.38.0** 起随附的 `codeg-cli` 可通过桌面应用或服务器运行智能体和助手，每次运行都会保存为对话。→ [命令行](/zh/guide/command-line)
 - **从任意浏览器使用你的桌面应用**——启用 **设置 → Web 服务**，Codeg 便会通过网络提供其界面，并由访问令牌保护（并为手机提供二维码）。由于它监听所有网络接口，你可以从任何能连接到你机器的设备访问你的桌面会话——无需单独的服务器。→ [Web 服务](/zh/reference/settings/web-service)
 - **在专用服务器上运行**——对于无头或团队使用场景，部署 `codeg-server` 并从任意浏览器使用 Codeg。→ [部署](/zh/getting-started/deployment)
 - **从源码构建**——参见[开发](/zh/reference/development)指南。

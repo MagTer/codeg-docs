@@ -22,6 +22,8 @@ You don't need a server for that — turn on [Web Service](/reference/settings/w
 
 Every method installs `codeg-server` and its `codeg-mcp` companion, so multi-agent delegation works on the server exactly as it does on the desktop. Since **0.33.0** the install scripts and the release archives also carry `codeg-computer-helper`, for a server that should offer [computer use](/guide/computer-use) on its own desktop; the Docker image doesn't.
 
+Since **0.38.0**, the packages and Docker image also include **`codeg-cli`**, for running agents and assistants from a terminal or CI job. → [Command Line](/guide/command-line)
+
 ## Docker
 
 The fastest durable deployment is one command:
@@ -40,7 +42,7 @@ docker run -d -p 3080:3080 \
   ghcr.io/spacering-net/codeg:latest
 ```
 
-Images are published multi-arch (amd64 + arm64) to `ghcr.io/spacering-net/codeg` and Docker Hub `xintaofei/codeg`, tagged with each release's version (`:0.37.0`). `:latest` follows **stable** releases only — a release candidate gets a version tag of its own, ending in `-rc.N`, and never moves `latest`.
+Images are published multi-arch (amd64 + arm64) to `ghcr.io/spacering-net/codeg` and Docker Hub `xintaofei/codeg`, tagged with each release's version (`:0.38.0`). `:latest` follows **stable** releases only — a release candidate gets a version tag of its own, ending in `-rc.N`, and never moves `latest`.
 
 ::: warning Pulling from `ghcr.io/xintaofei/codeg`? Switch names
 Codeg's repository moved to `spacering-net/codeg`, and since **0.34.0** GitHub's registry publishes under the new name. **`ghcr.io/xintaofei/codeg` stays at 0.33.0** — a container or Compose file that still names it keeps pulling that release and never updates again. Change the image to `ghcr.io/spacering-net/codeg`; the `codeg-data` volume isn't tied to the image name, so your data comes along. Docker Hub's `xintaofei/codeg` carries on as before.
@@ -85,10 +87,10 @@ Install the native binary straight onto a host:
 curl -fsSL https://raw.githubusercontent.com/spacering-net/codeg/main/install.sh | bash
 ```
 
-This places `codeg-server` and `codeg-mcp` in `/usr/local/bin` and the bundled web assets in `/usr/local/share/codeg/web`, using `sudo` only if the target isn't already writable. Pin a version or change the location with `--version` / `--dir`:
+This places `codeg-server`, `codeg-mcp`, `codeg-computer-helper`, and `codeg-cli` in `/usr/local/bin` and the bundled web assets in `/usr/local/share/codeg/web`, using `sudo` only if the target isn't already writable. Pin a version or change the location with `--version` / `--dir`:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/spacering-net/codeg/main/install.sh | bash -s -- --version v0.26.0 --dir ~/.local/bin
+curl -fsSL https://raw.githubusercontent.com/spacering-net/codeg/main/install.sh | bash -s -- --version v0.38.0 --dir ~/.local/bin
 ```
 
 Then start it. The installer prints the exact command for you; add `--supervise` on an unattended host so a failed self-upgrade rolls back automatically:
@@ -111,7 +113,7 @@ This installs to **`%LOCALAPPDATA%\codeg-server`** and adds it to your PATH. Sta
 $env:CODEG_STATIC_DIR="$env:LOCALAPPDATA\codeg-server\web"; codeg-server
 ```
 
-Pin a version with `.\install.ps1 -Version v0.26.0`, or choose the folder with `-InstallDir`. Self-update is disabled on Windows — upgrade by re-running the installer.
+Pin a version with `.\install.ps1 -Version v0.38.0`, or choose the folder with `-InstallDir`. Self-update is disabled on Windows — upgrade by re-running the installer.
 
 ::: info The server has a folder of its own since 0.33.0
 It used to install into `%LOCALAPPDATA%\codeg` — the **desktop app's** folder — where the two could overwrite each other's files and stop each other's processes. Re-running the script moves a server it finds sharing that folder out into `codeg-server`, taking only `codeg-server.exe` and its PATH entry and leaving the desktop app's files alone; a server that had the old folder to itself stays where it is. The script refuses any target that holds the desktop app, and a server started from the desktop app's folder warns at startup that it should move. If a service, a scheduled task or a shortcut starts the old copy, or `CODEG_STATIC_DIR` still points at `%LOCALAPPDATA%\codeg\web`, point it at the new folder.
@@ -144,6 +146,7 @@ pnpm install && pnpm build          # build the web UI
 cd src-tauri
 cargo build --release --bin codeg-server --no-default-features --features server-bin
 cargo build --release --bin codeg-mcp --no-default-features --features mcp-bin   # delegation companion
+cargo build --release --bin codeg-cli --no-default-features --features cli-bin   # command-line client
 CODEG_STATIC_DIR=../out ./target/release/codeg-server
 ```
 
@@ -208,11 +211,15 @@ Since **0.35.2** it also **keeps a copy of itself in your browser**. A tab the b
 - **One copy per release.** A new version installs a fresh copy and clears the older ones, keeping only the previous release's files. If installing can't complete — behind a sign-in proxy that redirects the request for it, say — there's simply no copy, and nothing else changes.
 - **Pages still come from the server first.** A page load uses the copy only when the server can't answer — no connection at all, or a server error — so a redirect to a sign-in page, or any other answer the server gives, goes through as usual. The build files themselves, which don't change within a release, are served straight from the copy.
 
-Codeg has no switch for it; to remove the copy, clear the site's data in your browser.
+**After a server upgrade or rollback**, an already-open tab can still be running the previous UI. Since **0.38.0**, Codeg checks the server's version on page load and after reconnecting. If it differs, a persistent notice names both versions and offers **Reload**. A page performing its own in-app upgrade or rollback reloads itself instead. New page loads revalidate the server's files; content-hashed build assets remain cacheable.
+
+Codeg has no switch for the browser cache; to remove the copy, clear the site's data in your browser.
 
 ## Keep your server up to date
 
 Like the desktop app, `codeg-server` updates itself from **Settings → Software Update**: it downloads the signed release for its platform, verifies the signature — which, since **0.36.0**, must name the very version on offer, so an older signed archive can't pass for a newer one — swaps the binaries and web assets on disk, and restarts — no redeploy. The previous version is retained, so the same screen offers a **Roll back**. This is Linux/macOS only (disabled on Windows). A server that can't write to its own installation — a binary or web folder it doesn't own, a full disk — says so on that screen **before** you try, since **0.32.1**, and offers the release page for a manual update instead.
+
+**Updating from 0.37.0 does not install `codeg-cli`.** Extract it from the new release's server archive and put it beside `codeg-server`. Updates started from **0.38.0 onward** update the matching CLI too. Restarting the server ends its active CLI runs, so let important work finish before upgrading.
 
 Run it under its supervisor to make upgrades safe:
 

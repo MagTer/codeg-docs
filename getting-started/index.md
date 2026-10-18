@@ -89,6 +89,7 @@ Within a single session, a main agent can delegate subtasks to sub-agents of *di
 
 Codeg treats agents as something you *run*, not just chat with:
 
+- **[Command Line](/guide/command-line)** — run agents and assistants from scripts or CI with `codeg-cli`, with parallel runs, structured results, and a conversation you can continue in Codeg.
 - **[Automations](/guide/automations)** — save a fully-configured setup and run it headlessly, on a cron schedule or on demand.
 - **[To-dos](/guide/tasks)** — write down what needs doing and let agents work through the list, each in its own copy of the code, each waiting for your review before it merges.
 - **[Repository panel](/guide/repository)** — list a project's GitHub, GitLab or Gitea issues and pull requests, hand one to an agent — or let the panel pick matching ones up by itself — and send the result back as a pull request.
@@ -115,7 +116,7 @@ Codeg is deliberately un-opinionated about *which* agent you should use, and car
 
 - **Agent-agnostic.** New agents plug in through ACP rather than bespoke integrations, so the workspace grows as the ecosystem does.
 - **Local-first.** Parsing, storage, and project operations happen on your machine by default; network calls happen only for something you set in motion. See [Privacy & Security](/reference/privacy).
-- **One core, four binaries.** A shared Rust core powers the desktop app, the standalone server, the MCP companion and the computer-use helper alike; native mobile clients connect to that core over its authenticated API. See the [Architecture](/reference/architecture).
+- **One core, five binaries.** A shared Rust core powers the desktop app, standalone server, command-line client, MCP companion, and computer-use helper; native mobile clients connect to that core over its authenticated API. See the [Architecture](/reference/architecture).
 
 Codeg stands on the shoulders of open work — the [Agent Client Protocol](https://agentclientprotocol.com) for agent connectivity, [Superpowers](https://github.com/obra/superpowers) for expert skills, [OfficeCLI](https://github.com/iOfficeAI/OfficeCLI) for documents, and [scientific-agent-skills](https://github.com/K-Dense-AI/scientific-agent-skills) for research.
 

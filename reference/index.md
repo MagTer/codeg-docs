@@ -31,7 +31,7 @@ Codeg gathers every preference into one **Settings** window (its sidebar is head
 | **Chat Channels** | IM bots for notifications and remote control | [Guide → Chat Channels](/guide/chat-channels) |
 | **Web Service** | Expose Codeg to a browser — port, token, QR *(desktop only)* | [Web Service](/reference/settings/web-service) |
 | **Runtime Logs** | Diagnostic logs — level, live viewer, files | [Runtime Logs](/reference/settings/logs) |
-| **System** | Updates, launch at login, network proxy, language, configuration sync, backup & restore | [System](/reference/settings/system) |
+| **System** | Updates, launch at login, command-line access, network proxy, language, configuration sync, backup & restore | [System](/reference/settings/system) |
 
 Opening Settings lands you on **Appearance**. Every screen is there whether you run the desktop app or reach Codeg through a browser — with one exception, dropped from the nav in a browser session: **Web Service**, because it's the screen that *turns on* browser access in the first place. Two more are there but narrower. **Browser Use** keeps only the rows that still decide something in a browser — site rules (to block), what a server started in a terminal does, and the terminal's link menu. **Computer Use** acts on the server machine's own desktop, and only when that server was started with `CODEG_COMPUTER_USE=1`.
 
@@ -47,7 +47,7 @@ MCP, Skills, Skill Packs, Agents, Model Providers, and Chat Channels are feature
 
 How Codeg is built, and how it handles what you give it.
 
-- [**Architecture**](/reference/architecture) — one Rust core, four binaries: the `codeg` desktop app, the standalone `codeg-server`, the `codeg-mcp` companion that powers delegation and the in-conversation tools, and the `codeg-computer-helper` behind computer use. How the pieces fit, and how they drive external agent CLIs over ACP.
+- [**Architecture**](/reference/architecture) — one Rust core, five binaries: the `codeg` desktop app, the standalone `codeg-server`, the `codeg-cli` terminal client, the `codeg-mcp` companion that powers delegation and the in-conversation tools, and the `codeg-computer-helper` behind computer use. How the pieces fit, and how they drive external agent CLIs over ACP.
 - [**Privacy & Security**](/reference/privacy) — what stays on your machine, when the network is actually touched, and how agent credentials and web-service tokens are handled.
 
 ## Contributing
