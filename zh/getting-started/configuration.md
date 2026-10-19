@@ -29,6 +29,7 @@ Codeg 在两个地方进行配置。桌面应用和 Web 界面通过 **设置** 
 | `CODEG_PORT` | `3080` | HTTP 和 WebSocket 监听端口。 |
 | `CODEG_HOST` | `0.0.0.0` | 绑定地址——一个 IP、`localhost` 或带方括号的 IPv6 字面量。`0.0.0.0` 会在每个接口上暴露它。 |
 | `CODEG_TOKEN` | *（随机）* | 每个 API 和 WebSocket 请求都需要的访问令牌。例外的那几类要么自带凭证——一次性下载链接、Office 实时预览的单文档能力凭证、forge [经过签名的 webhook 推送](/zh/reference/privacy#webhooks-for-auto-processing)——要么不泄露任何东西：Web 应用自身的文件，以及登录页的语言查询。若未设置，则会生成一个、保存到数据库，并在启动时打印到 stderr。 |
+| `CODEG_AUTH` | `token` | 设为 `proxy-jwt` 时，服务器还会校验身份感知代理的签名断言，放行已由代理登录的浏览器，浏览器因此无需令牌。需要另外设置四个 `CODEG_PROXY_AUTH_*` 变量。→ [通过身份感知代理登录](#sign-in-through-an-identity-aware-proxy) |
 | `CODEG_DATA_DIR` | *（因操作系统而异——见下文）* | 数据库、上传文件、日志和密钥的根目录。 |
 | `CODEG_STATIC_DIR` | `./web` | 要提供服务的捆绑 Web 界面所在目录。 |
 | `CODEG_MCP_BIN` | *（自动）* | 当 `codeg-mcp` 伴生程序不在服务器二进制文件旁边时其所在路径——某些源码构建需要它。没有它，[多智能体委派](/zh/guide/multi-agent)会被静默禁用。 |
@@ -39,6 +40,56 @@ Codeg 在两个地方进行配置。桌面应用和 Web 界面通过 **设置** 
 | `CODEG_COMPUTER_USE` | *（关闭）* | 设为 `1`、`true`、`yes` 或 `on` 时，通过安装在服务器旁边的 `codeg-computer-helper`，在服务器那台机器自己的桌面上提供[电脑操作](/zh/guide/computer-use#on-a-server)。在 Linux 上，若没有 `DISPLAY` 或 `WAYLAND_DISPLAY`，它会发出警告。桌面应用不读取这个变量。 |
 
 关于 `CODEG_HOST` 和 `CODEG_TOKEN` 在网络和 TLS 方面的影响，参见[部署](/zh/getting-started/deployment#access-it-securely)。
+
+## 通过身份感知代理登录 {#sign-in-through-an-identity-aware-proxy}
+
+当 `codeg-server` 部署在一个已经负责用户登录的代理之后（例如 [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/policies/access/)），访问令牌就成了代理登录之上的第二次登录。设置 `CODEG_AUTH=proxy-jwt` 后，服务器还会放行携带代理签名断言（一个 JWT）的请求，浏览器因此无需令牌。在此模式下令牌依然有效，供不经过代理的客户端使用，例如 `codeg-cli --url` 和脚本。
+
+| 变量 | 取值 |
+| -------- | ----- |
+| `CODEG_AUTH` | `proxy-jwt` 开启此模式。未设置或为 `token`：仅使用令牌。 |
+| `CODEG_PROXY_AUTH_HEADER` | 携带断言的请求头。 |
+| `CODEG_PROXY_AUTH_JWKS_URL` | 代理发布其签名密钥的地址。须为 `https`，仅回环主机可用纯 `http`。 |
+| `CODEG_PROXY_AUTH_ISSUER` | 断言必须携带的确切 `iss`。 |
+| `CODEG_PROXY_AUTH_AUDIENCE` | 断言的 `aud` 必须包含的值。 |
+
+仅有请求头并不会放行任何请求，因为任何能访问该端口的程序都能设置请求头。服务器会用代理发布的密钥校验断言的签名，并检查其签发者、受众和有效期。所有检查都按失败即拒绝处理：
+
+- 缺少某项设置、模式名拼写错误，或设置了代理相关变量却未设置 `CODEG_AUTH=proxy-jwt`，服务器会在启动时以退出码 2 停止，并指出相应变量。
+- 断言缺失、格式错误、已过期、属于其他受众或签发者、由未知密钥签名，或使用 RS256 和 ES256 以外的算法签名，均返回 401。在无法获取任何密钥期间，所有不带令牌的请求也返回 401。服务器只记录原因，从不记录断言本身。
+- 断言有效、但请求由其他源的页面发出时，返回 403。参见[来自其他源的请求](#requests-from-other-origins)。
+
+密钥在启动时获取，缓存一小时。当断言引用了服务器未见过的密钥时会提前重新获取，最多每 30 秒一次。获取失败时，继续使用已持有的密钥。`exp` 和 `nbf` 允许 60 秒的时钟偏差。
+
+### Cloudflare Access {#cloudflare-access}
+
+其中 `<team>` 是你的 Zero Trust 团队名称，`<AUD tag>` 是应用概览页上的 **Application Audience (AUD) Tag**：
+
+```bash
+CODEG_AUTH=proxy-jwt
+CODEG_PROXY_AUTH_HEADER=Cf-Access-Jwt-Assertion
+CODEG_PROXY_AUTH_JWKS_URL=https://<team>.cloudflareaccess.com/cdn-cgi/access/certs
+CODEG_PROXY_AUTH_ISSUER=https://<team>.cloudflareaccess.com
+CODEG_PROXY_AUTH_AUDIENCE=<AUD tag>
+```
+
+将服务器绑定到回环地址（`CODEG_HOST=127.0.0.1`），只通过隧道访问它，这样每个浏览器请求都会经过 Access。通过这种方式打开时，Web 应用会跳过令牌提示。Access 会话过期时，应用会显示 **Sign-in expired** 和 **Reload**。重新加载会让 Access 再次运行登录。
+
+### 谁能进入 {#who-gets-in}
+
+在此模式下，Codeg 不挑选用户。凡是代理以本应用的有效断言担保的请求，它都会放行，包括应用策略允许的服务令牌。因此代理的策略就是用户名单。请只纳入应当使用这台服务器的人，例如你自己的地址或某一个组，切勿使用 `Everyone`。受众检查把断言绑定到这一个应用上，因此登录同一代理后面的其他应用并不能进入 Codeg。
+
+### 来自其他源的请求 {#requests-from-other-origins}
+
+断言随代理的会话 Cookie 一起发送，而浏览器也会把这个 Cookie 附加到其他源的页面发出的请求上。因此，凭断言放行的请求必须来自 Codeg 自己的页面。服务器会在两种情况下以 403 拒绝：浏览器把请求标记为来自其他源（`Sec-Fetch-Site`），或者请求的 `Origin` 所指的主机与请求实际发往的主机不同（`Host`，或改写 `Host` 的代理所设置的 `X-Forwarded-Host`）。令牌不受影响，因为其他源的页面无法发送它。
+
+Chrome 在 WebSocket 握手中不发送 `Sec-Fetch-Site`，因此对事件套接字起决定作用的是 `Origin`。所以 Codeg 前面的代理必须原样传递浏览器的 `Host`，或将其放入 `X-Forwarded-Host`。Cloudflare Tunnel 正是如此：它保留 `Host`；设置了 `httpHostHeader` 时，则把原值移到 `X-Forwarded-Host`。否则套接字会被拒绝，服务器的警告会写明 `Origin` 及其看到的主机。
+
+::: warning `SameSite` 不覆盖同级子域名
+把 Access 应用的 Cookie 设为 `SameSite=Lax`，可以让来自无关站点的请求不携带它（顶层导航除外，例如点击链接进入 Codeg）。但 `SameSite` 是按*站点*（协议加可注册域名）判断的，而不是按源。同一域名下其他子域名上的页面，例如与 `codeg.example.com` 上的 Codeg 并列、位于 `wiki.example.com` 的另一个应用，属于同一站点，即使 Cookie 设为 `Lax` 或 `Strict`，它发出的请求依然会带上这个 Cookie。拒绝这类请求的正是上文的服务器端检查，在同一域名下部署其他应用之前请记住这一点。
+:::
+
+此模式适用于独立服务器 `codeg-server`。桌面应用的 Web 服务仍然只使用令牌。
 
 ## Codeg 将数据存储在何处 {#where-codeg-stores-its-data}
 

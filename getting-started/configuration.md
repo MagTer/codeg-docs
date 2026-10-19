@@ -29,6 +29,7 @@ The variables you're most likely to set on a server:
 | `CODEG_PORT` | `3080` | HTTP and WebSocket listen port. |
 | `CODEG_HOST` | `0.0.0.0` | Bind address — an IP, `localhost`, or a bracketed IPv6 literal. `0.0.0.0` exposes it on every interface. |
 | `CODEG_TOKEN` | *(random)* | Access token required on every API and WebSocket request. The exceptions carry proof of their own — a single-use download link, an Office live preview's per-document capability, a forge's [signed webhook delivery](/reference/privacy#webhooks-for-auto-processing) — or give nothing away: the web app's own files, and the login page's language lookup. If unset, one is generated, saved to the database, and printed to stderr at startup. |
+| `CODEG_AUTH` | `token` | `proxy-jwt` also admits a browser that an identity-aware proxy has signed in, by checking the proxy's signed assertion, so the browser needs no token. Needs four `CODEG_PROXY_AUTH_*` settings. → [Sign in through an identity-aware proxy](#sign-in-through-an-identity-aware-proxy) |
 | `CODEG_DATA_DIR` | *(per-OS — see below)* | Root for the database, uploads, logs, and secrets. |
 | `CODEG_STATIC_DIR` | `./web` | Directory of the bundled web UI to serve. |
 | `CODEG_MCP_BIN` | *(auto)* | Path to the `codeg-mcp` companion when it doesn't sit beside the server binary — needed for some source builds. Without it, [multi-agent delegation](/guide/multi-agent) is silently disabled. |
@@ -39,6 +40,56 @@ The variables you're most likely to set on a server:
 | `CODEG_COMPUTER_USE` | *(off)* | `1`, `true`, `yes` or `on` offers [computer use](/guide/computer-use#on-a-server) on the server machine's own desktop, through the `codeg-computer-helper` installed beside the server. On Linux it warns when there's no `DISPLAY` or `WAYLAND_DISPLAY`. The desktop app doesn't read it. |
 
 See [Deployment](/getting-started/deployment#access-it-securely) for the networking and TLS implications of `CODEG_HOST` and `CODEG_TOKEN`.
+
+## Sign in through an identity-aware proxy {#sign-in-through-an-identity-aware-proxy}
+
+When `codeg-server` sits behind a proxy that already signs people in, such as [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/policies/access/), the token is a second login on top of the proxy's. With `CODEG_AUTH=proxy-jwt` the server also admits a request that carries the proxy's signed assertion (a JWT), so the browser needs no token. The token keeps working in this mode, for clients that do not pass through the proxy, such as `codeg-cli --url` and scripts.
+
+| Variable | Value |
+| -------- | ----- |
+| `CODEG_AUTH` | `proxy-jwt` turns the mode on. Unset or `token`: token only. |
+| `CODEG_PROXY_AUTH_HEADER` | The request header that holds the assertion. |
+| `CODEG_PROXY_AUTH_JWKS_URL` | Where the proxy publishes its signing keys. `https`, or plain `http` for a loopback host only. |
+| `CODEG_PROXY_AUTH_ISSUER` | The exact `iss` the assertion must carry. |
+| `CODEG_PROXY_AUTH_AUDIENCE` | A value the assertion's `aud` must hold. |
+
+The header alone admits nothing, since anything that can reach the port can set a header. The server checks the assertion's signature against the proxy's published keys, and checks its issuer, audience and expiry. Everything fails closed:
+
+- A missing setting, a misspelled mode, or a proxy setting without `CODEG_AUTH=proxy-jwt` stops the server at startup with exit code 2, naming the variable.
+- An assertion that is missing, malformed, expired, for another audience or issuer, signed with an unknown key, or signed with anything other than RS256 or ES256 gets a 401. So does every request without the token while no keys could be fetched. The server logs the reason, never the assertion.
+- A valid assertion on a request that a page on another origin sent gets a 403. See [Requests from other origins](#requests-from-other-origins).
+
+Keys are fetched at startup and kept for an hour. They are fetched again early when an assertion names a key the server has not seen, at most once every 30 seconds. If a fetch fails, the keys already held stay in use. `exp` and `nbf` allow 60 seconds of clock skew.
+
+### Cloudflare Access {#cloudflare-access}
+
+Here `<team>` is your Zero Trust team name, and `<AUD tag>` is the **Application Audience (AUD) Tag** from the application's overview page:
+
+```bash
+CODEG_AUTH=proxy-jwt
+CODEG_PROXY_AUTH_HEADER=Cf-Access-Jwt-Assertion
+CODEG_PROXY_AUTH_JWKS_URL=https://<team>.cloudflareaccess.com/cdn-cgi/access/certs
+CODEG_PROXY_AUTH_ISSUER=https://<team>.cloudflareaccess.com
+CODEG_PROXY_AUTH_AUDIENCE=<AUD tag>
+```
+
+Bind the server to loopback (`CODEG_HOST=127.0.0.1`) and reach it only through the tunnel, so that every browser request passes Access. Opened that way, the web app skips the token prompt. When the Access session expires, the app shows **Sign-in expired** with **Reload**. Reloading lets Access run its login again.
+
+### Who gets in {#who-gets-in}
+
+Codeg does not pick users in this mode. It admits every request the proxy vouches for with a valid assertion for this application, including a service token that the application's policy allows. That makes the proxy's policy the user list. Keep it to the people who should use this server, such as your own address or one group, and never `Everyone`. The audience check ties an assertion to this one application, so a sign-in to another application behind the same proxy does not get in.
+
+### Requests from other origins {#requests-from-other-origins}
+
+The assertion travels with the proxy's session cookie, and a browser also attaches that cookie to requests that pages on other origins make. A request admitted by an assertion must therefore come from Codeg's own page. The server refuses it with a 403 in two cases: when the browser marks it as sent from another origin (`Sec-Fetch-Site`), or when its `Origin` names a different host from the one the request was sent to (`Host`, or `X-Forwarded-Host` from a proxy that rewrites `Host`). The token is not affected, because a page on another origin cannot send it.
+
+Chrome sends no `Sec-Fetch-Site` on a WebSocket handshake, so for the event socket the `Origin` decides. A proxy in front of Codeg must therefore pass the browser's `Host` on, or put it in `X-Forwarded-Host`. Cloudflare Tunnel does: it keeps the `Host`, and when `httpHostHeader` is set it moves the original to `X-Forwarded-Host`. Otherwise the socket is refused, and the server's warning names the `Origin` and the hosts it saw.
+
+::: warning `SameSite` does not cover sibling subdomains
+Setting the Access application's cookie to `SameSite=Lax` keeps it off requests from unrelated sites, apart from top-level navigations such as a link into Codeg. But `SameSite` is decided per *site*, meaning the scheme and the registrable domain, not per origin. A page on another subdomain of the same domain, such as another app at `wiki.example.com` next to Codeg at `codeg.example.com`, is the same site, so its requests carry the cookie even under `Lax` or `Strict`. The server-side check above is what refuses those, so keep it in mind before you serve other apps under the same domain.
+:::
+
+This mode applies to the standalone `codeg-server`. The desktop app's web service stays token-only.
 
 ## Where Codeg stores its data
 
